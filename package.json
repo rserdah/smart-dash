@@ -1,11 +1,32 @@
 {
-  "name": "smart-dash",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC"
+    "name": "smart-dash",
+    "version": "1.0.0",
+    "description": "",
+    "main": "electron/main.ts",
+    "type": "module",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "vite",
+        "electron": "electron .",
+        "dev:all": "npx cross-env NODE_ENV=development concurrently -k \"npm run dev\" \"npm run electron\""
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.1",
+        "react": "^19.2.0",
+        "react-dom": "^19.2.0"
+    },
+    "devDependencies": {
+        "@types/node": "^24.10.1",
+        "@types/react": "^19.2.7",
+        "@types/react-dom": "^19.2.3",
+        "@vitejs/plugin-react": "^5.1.1",
+        "concurrently": "^9.2.1",
+        "cross-env": "^10.1.0",
+        "electron": "^39.2.3",
+        "typescript": "^5.9.3",
+        "vite": "^7.2.4"
+    }
 }
