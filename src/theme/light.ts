@@ -1,8 +1,16 @@
-const lightTheme = {
-    name: 'light',
-    bg: '#ffffff',
-    text: '#111111',
-    primary: '#4a90e2'
-}
+import { css } from '@emotion/react';
 
-export default lightTheme
+const lightTheme = css`
+    :root {
+        --background-color: #dddddd;
+        --text-color: #0f0f0f;
+        --input-gutter-color: #C7C7C7;
+        --input-handle-color: white;
+        --input-border-color: gray;
+        --input-shadow-color: #878787;
+        --input-keyboard-background: #b2b2b2;
+        --input-keyboard-key-background: white;
+    }
+`;
+
+export default lightTheme;

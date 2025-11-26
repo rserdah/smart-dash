@@ -1,28 +1,36 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
-import { ThemeProvider } from '@emotion/react';
-import { themes } from './index';
+import { useState, useEffect, createContext, useContext, ReactNode, PropsWithChildren } from 'react';
+import { ThemeProvider, Global } from '@emotion/react';
+import { baseTheme, themes, ThemeName } from './index';
 
-type ThemeName = keyof typeof themes;
+interface AppThemeProviderProps {
+    theme: ThemeName,
+    setTheme: (name: ThemeName) => void
+}
 
-const ThemeContext = createContext<{
-    themeName: ThemeName,
-    setThemeName: (name: ThemeName) => void
-}>({
-    themeName: 'light',
-    setThemeName: (name: ThemeName) => { }
-});
+const ThemeContext = createContext<AppThemeProviderProps | null>(null);
 
 export const useThemeSwitcher = () => useContext(ThemeContext);
 
-export const AppThemeProvider = ({ children }: { children?: ReactNode }) => {
-    const [themeName, setThemeName] = useState<ThemeName>('light');
-    const theme = themes[themeName];
+export const AppThemeProvider = ({ children }: PropsWithChildren) => {
+    const [theme, setTheme] = useState<ThemeName>('light');
+    const currentTheme = themes[theme];
+
+    useEffect(() => {
+        setTimeout(() => {
+            setTheme('dark');
+        }, 3000);
+    }, []);
 
     return (
-        <ThemeContext.Provider value={{ themeName, setThemeName }}>
-            <ThemeProvider theme={theme}>
-                {children}
-            </ThemeProvider>
-        </ThemeContext.Provider>
+        <>
+            <Global styles={baseTheme} />
+            <Global styles={currentTheme} />
+
+            <ThemeContext.Provider value={{ theme, setTheme }}>
+                <ThemeProvider theme={currentTheme}>
+                    {children}
+                </ThemeProvider>
+            </ThemeContext.Provider>
+        </>
     )
 };
