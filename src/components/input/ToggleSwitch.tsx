@@ -6,7 +6,7 @@ import { css } from '@emotion/react';
 interface ToggleSwitchProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
-const ToggleSwitchBox = styled.div<ToggleSwitchProps>`
+const ToggleSwitchBox = styled.div`
     --toggle-switch-width: 40px;
     --toggle-switch-height: 20px;
     position: relative;
@@ -65,7 +65,7 @@ export default function ToggleSwitch(props: ToggleSwitchProps) {
     return (
         <ToggleSwitchBox onClick={e => setValue(!value)}>
             <Gutter $value={value} /* className={`toggle-switch__gutter ${value ? 'toggle-switch__gutter--on' : 'toggle-switch__gutter--off'}`} */>
-                <Handle $value={value} /* className={`toggle-switch__handle ${value ? 'toggle-switch__handle--on' : 'toggle-switch__handle--off'}`} */></Handle>
+                <Handle $value={value} /* className={`toggle-switch__handle ${value ? 'toggle-switch__handle--on' : 'toggle-switch__handle--off'}`} */ />
             </Gutter>
         </ToggleSwitchBox>
     )

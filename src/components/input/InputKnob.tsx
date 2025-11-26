@@ -10,6 +10,37 @@ interface Vector {
     y: number, 
 }
 
+const InputKnobBox = styled.div`
+    position: relative;
+    width: 100px;
+    height: 100px;
+`;
+
+const InputKnobHandle = styled.div`
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100px;
+    height: 100px;
+    background: var(--input-handle-color);
+    border-radius: 999px;
+    outline: 1px solid var(--input-border-color);
+    box-shadow: 0px 0px 5px 2px var(--primary-color);
+    transform: rotate(0deg);
+    transition: outline 0.5s ease, box-shadow 0.5s ease;
+`;
+
+const InputKnobIndicator = styled.div`
+    --handle-indicator-size: 10px;
+    position: absolute;
+    width: var(--handle-indicator-size);
+    height: var(--handle-indicator-size);
+    top: 5px;
+    left: calc(50% - var(--handle-indicator-size) / 2);
+    border-radius: 999px;
+    background: gray;
+`;
+
 export default function InputKnob(props: InputKnobProps) {
     const [value, setValue] = useState<number>(0);
     const [rotOffset, setRotOffset] = useState<number>(0);
@@ -127,37 +158,6 @@ export default function InputKnob(props: InputKnobProps) {
         window.addEventListener('mousemove', onMouseMove);
         window.addEventListener('mouseup', onMouseUp);
     };
-
-    const InputKnobBox = styled.div`
-        position: relative;
-        width: 100px;
-        height: 100px;
-    `;
-
-    const InputKnobHandle = styled.div`
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        width: 100px;
-        height: 100px;
-        background: var(--input-handle-color);
-        border-radius: 999px;
-        outline: 1px solid var(--input-border-color);
-        box-shadow: 0px 0px 5px 2px var(--primary-color);
-        transform: rotate(0deg);
-        transition: outline 0.5s ease, box-shadow 0.5s ease;
-    `;
-
-    const InputKnobIndicator = styled.div`
-        --handle-indicator-size: 10px;
-        position: absolute;
-        width: var(--handle-indicator-size);
-        height: var(--handle-indicator-size);
-        top: 5px;
-        left: calc(50% - var(--handle-indicator-size) / 2);
-        border-radius: 999px;
-        background: gray;
-    `;
 
     return (
         <InputKnobBox>

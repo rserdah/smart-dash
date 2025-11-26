@@ -7,7 +7,7 @@ interface KeyboardProps {
 }
 
 const KeyboardBox = styled.div`
-    --keyboard-base-unit: 5cm; /* original 100px, the 5cm is for mobile */
+    --keyboard-base-unit: 80px;
     box-sizing: border-box;
     position: absolute;
     display: flex;
@@ -66,10 +66,10 @@ const Keyboard__row__row3 = css``;
 const Keyboard__key__shift = css`
     --keyboard-key-width: calc(var(--keyboard-base-unit) * 0.45);
 `;
+
 const Keyboard__key__backspace = css`
     --keyboard-key-width: calc(var(--keyboard-base-unit) * 0.45);
 `;
-
 
 export default function Keyboard(props: KeyboardProps) {
     const numberRow = [

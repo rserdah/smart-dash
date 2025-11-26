@@ -9,17 +9,19 @@ interface AppThemeProviderProps {
 
 const ThemeContext = createContext<AppThemeProviderProps | null>(null);
 
-export const useThemeSwitcher = () => useContext(ThemeContext);
+export const useThemeContext = () => {
+    const ctx = useContext(ThemeContext);
+
+    if (!ctx) {
+        throw new Error("useThemeContext must be used inside <AppThemeProvider>");
+    }
+
+    return ctx;
+};
 
 export const AppThemeProvider = ({ children }: PropsWithChildren) => {
     const [theme, setTheme] = useState<ThemeName>('light');
     const currentTheme = themes[theme];
-
-    useEffect(() => {
-        setTimeout(() => {
-            setTheme('dark');
-        }, 3000);
-    }, []);
 
     return (
         <>

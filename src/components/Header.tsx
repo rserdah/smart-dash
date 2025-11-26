@@ -6,10 +6,10 @@ import { css } from '@emotion/react';
 interface HeaderProps {
 }
 
-export default function Header(props: HeaderProps) {
-    const AppHeader = styled.div`padding: 10px;`;
-    const AppTitle = styled.h1`margin: 0px; font-family: "Onest", sans-serif; font-optical-sizing: auto; font-weight: 400; font-style: normal; color: white;`;
+const AppHeader = styled.div`padding: 10px;`;
+const AppTitle = styled.h1`margin: 0px; font-family: "Onest", sans-serif; font-optical-sizing: auto; font-weight: 400; font-style: normal; color: white;`;
 
+export default function Header(props: HeaderProps) {
     return (
         <AppHeader>
             <AppTitle>
