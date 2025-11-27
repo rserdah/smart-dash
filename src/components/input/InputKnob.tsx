@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import React, { useState, useRef, useEffect } from 'react';
 import styled from '@emotion/styled';
+import { useDrag } from '@/hooks/useDrag';
 
 interface InputKnobProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
@@ -104,19 +105,7 @@ export default function InputKnob(props: InputKnobProps) {
 
     const normalizeVector = (v: Vector) => scaleVector(v, 1 / magnitude(v));
 
-    const onMouseMove = (e: MouseEvent) => {
-        const newDragX = e.clientX;
-        const newDragY = e.clientY;
-        setDragX(newDragX);
-        setDragY(newDragY);
-    };
-
-    const onMouseUp = (e: MouseEvent) => {
-        window.removeEventListener('mousemove', onMouseMove);
-        window.removeEventListener('mouseup', onMouseUp);
-    };
-
-    const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const onDragStart = (e: PointerEvent) => {
         // Prevent user from selecting text when dragging
         e.preventDefault();
 
@@ -154,10 +143,19 @@ export default function InputKnob(props: InputKnobProps) {
         setCenterX(newCenterX);
         setCenterY(newCenterY);
         setRotOffset(angle);
-
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
     };
+
+    const onDrag = (e: PointerEvent, info: { dx: number; dy: number }) => {
+        const newDragX = e.clientX;
+        const newDragY = e.clientY;
+        setDragX(newDragX);
+        setDragY(newDragY);
+    };
+
+    const onDragEnd = (e: PointerEvent) => {
+    };
+
+    const drag = useDrag({ onDragStart, onDrag, onDragEnd });
 
     return (
         <InputKnobBox>
@@ -165,7 +163,8 @@ export default function InputKnob(props: InputKnobProps) {
                 ref={handleRef}
                 className='input-knob__handle'
                 style={{ transform: `rotate(${rot}deg)` }}
-                onMouseDown={onMouseDown}
+                // onMouseDown={onMouseDown}
+                {...drag}
             >
                 <InputKnobIndicator />
             </InputKnobHandle>

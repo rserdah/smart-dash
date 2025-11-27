@@ -11,6 +11,7 @@ import ToggleSwitch from './components/input/ToggleSwitch';
 import Keyboard from './components/input/Keyboard';
 import InputText from './components/input/InputText';
 import ToggleButtonGroup from './components/input/ToggleButtonGroup';
+import InputLinearSlider from './components/input/InputLinearSlider';
 
 interface AppProps extends PropsWithChildren {
 }
@@ -69,6 +70,9 @@ export default function App(props: AppProps) {
                 <ToggleSwitch />
                 {/* <Keyboard /> */}
                 <InputText />
+                <InputLinearSlider />
+
+                <div css={css`margin-bottom: 100px;`}></div>
             </AppCenterBox>
 
             <AppLowerBox>
