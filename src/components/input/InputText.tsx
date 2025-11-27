@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, { useState, useRef, ChangeEvent } from 'react';
+import React, { useState, useRef, forwardRef, ChangeEvent } from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 
@@ -7,7 +7,6 @@ interface InputTextProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 const InputTextBox = styled.div`
-    ${p => ((() => { console.log(p); return ''})())}
     --toggle-switch-width: 40px;
     --toggle-switch-height: 20px;
     position: relative;
@@ -34,8 +33,8 @@ const InputTextInput = styled.input`
     }
 `;
 
-export default function InputText(props: InputTextProps) {
-    let value: string | number | readonly string[], onChange: React.ChangeEventHandler<HTMLInputElement>, setValue: React.Dispatch<React.SetStateAction<string>>;
+const InputText = forwardRef<HTMLInputElement, InputTextProps>((props: InputTextProps, ref) => {
+    let value: string | number | readonly string[], onChange: React.ChangeEventHandler<HTMLInputElement>, setValue: React.Dispatch<React.SetStateAction<typeof value>>;
 
     // If used as a controlled component, then just pass the value and onChange props to the inner input
     if(props.value != undefined && props.onChange != undefined) {
@@ -44,7 +43,7 @@ export default function InputText(props: InputTextProps) {
     }
     // Otherwise, this component manages its own state
     else {
-        ([value, setValue] = useState<string>(''));
+        ([value, setValue] = useState<typeof value>(props.defaultValue != undefined ? props.defaultValue : ''));
 
         onChange = e => {
             setValue(e.target.value);
@@ -53,7 +52,9 @@ export default function InputText(props: InputTextProps) {
 
     return (
         <InputTextBox>
-            <InputTextInput {...props} type='text' value={value} onChange={onChange} />
+            <InputTextInput {...props} ref={ref} type='text' value={value} onChange={onChange} />
         </InputTextBox>
     )
-}
+});
+
+export default InputText;

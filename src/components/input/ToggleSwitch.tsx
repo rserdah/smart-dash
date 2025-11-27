@@ -3,7 +3,9 @@ import React, { useState, useRef } from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 
-interface ToggleSwitchProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface ToggleSwitchProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onToggle'> {
+    // Omit the props not used or ones that should be overridden
+    onToggle?: (checked: boolean) => void, 
 }
 
 const ToggleSwitchBox = styled.div`
@@ -60,12 +62,28 @@ const Handle = styled.div<{ $value: boolean }>`
 `;
 
 export default function ToggleSwitch(props: ToggleSwitchProps) {
-    const [value, setValue] = useState(false);
+    let checked: boolean, onToggle: (checked: boolean) => void, setChecked: React.Dispatch<React.SetStateAction<typeof checked>>;
+
+    // TODO: Update this to use the improved hybrid control logic (see ToggleButtonGroup.tsx)
+    // TODO: Make this use a hidden checkbox internally and also make the component use forwardRef
+    // If used as a controlled component, parent manages state
+    if(props.checked != undefined && props.onToggle != undefined) {
+        checked = props.checked;
+        onToggle = props.onToggle;
+    }
+    // Otherwise, this component manages its own state
+    else {
+        ([checked, setChecked] = useState<typeof checked>(props.defaultChecked != undefined ? props.defaultChecked : false));
+
+        onToggle = (checked) => {
+            setChecked(checked);
+        };
+    }
 
     return (
-        <ToggleSwitchBox onClick={e => setValue(!value)}>
-            <Gutter $value={value} /* className={`toggle-switch__gutter ${value ? 'toggle-switch__gutter--on' : 'toggle-switch__gutter--off'}`} */>
-                <Handle $value={value} /* className={`toggle-switch__handle ${value ? 'toggle-switch__handle--on' : 'toggle-switch__handle--off'}`} */ />
+        <ToggleSwitchBox onClick={e => onToggle(!checked)}>
+            <Gutter $value={checked}>
+                <Handle $value={checked} />
             </Gutter>
         </ToggleSwitchBox>
     )

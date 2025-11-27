@@ -10,6 +10,7 @@ import InputKnob from './components/input/InputKnob';
 import ToggleSwitch from './components/input/ToggleSwitch';
 import Keyboard from './components/input/Keyboard';
 import InputText from './components/input/InputText';
+import ToggleButtonGroup from './components/input/ToggleButtonGroup';
 
 interface AppProps extends PropsWithChildren {
 }
@@ -22,6 +23,10 @@ const AppBox = styled.div`
     flex-direction: column;
     width: 100vw;
     height: 100vh;
+    font-family: "Onest", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
     /* background: radial-gradient(hsl(from var(--primary-color) h calc(s * 0.5) calc(l * 0.25)), var(--background-color)); */
     background: var(--background-color);
     transition: background-color 0.25s ease;
@@ -35,10 +40,6 @@ const AppCenterBox = styled.div`
     align-items: center;
     justify-content: center;
     width: 100%;
-    font-family: "Onest", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 500;
-    font-style: normal;
 `;
 
 const AppLowerBox = styled.div`
@@ -58,6 +59,10 @@ export default function App(props: AppProps) {
             <select css={css`margin: 10px; width: max-content; font-family: "Onest", sans-serif; font-size: 20px;`} value={theme} onChange={e => setTheme(e.target.value as ThemeName)}>
                 {options.map(x => ( <option value={x}>{x}</option> ))}
             </select>
+
+            <div css={css`display: flex; width: 100%; justify-content: center;`}>
+                <ToggleButtonGroup name='togglebuttongroup1' options={[{ label: 'Home', value: 'home' }, { label: 'Lighting', value: 'lighting' }, { label: 'Settings', value: 'settings' }, ]} />
+            </div>
 
             <AppCenterBox>
                 <InputKnob />
