@@ -7,11 +7,7 @@ interface InputTextProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 const InputTextBox = styled.div`
-    --toggle-switch-width: 40px;
-    --toggle-switch-height: 20px;
     position: relative;
-    width: var(--toggle-switch-width);
-    height: var(--toggle-switch-height);
 `;
 
 const InputTextInput = styled.input`

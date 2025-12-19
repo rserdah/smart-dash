@@ -30,7 +30,7 @@ function mapRange(
     return outMin + normalized * (outMax - outMin);
 }
 
-const sliderHeightPx = 30;
+const sliderHeightPx = 20;
 const progressBarPadPx = 1;
 
 const InputLinearSliderBox = styled.div<{ $sliderWidthPx: number }>`
@@ -89,9 +89,7 @@ const InputLinearSliderHandle = styled.div`
 
 export default function InputLinearSlider(props: InputLinearSliderProps) {
     const [value, setValue] = useState<number>(0);
-    const [styleValue, setStyleValue] = useState<number>(0); // The slider can't go all the way to 0 or else the drag will be messed up (and can't just clamp it with max-width)
-    const [dragX, setDragX] = useState<number>(0);
-    const [dragY, setDragY] = useState<number>(0);
+    const [styleValue, setStyleValue] = useState<number>(0);
 
     const gutterRef = useRef<HTMLDivElement | null>(null);
     const handleRef = useRef<HTMLDivElement | null>(null);

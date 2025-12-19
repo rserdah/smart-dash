@@ -4,6 +4,7 @@ const darkTheme = css`
     :root {
         --background-color: #0b0b0b;
         --text-color: #f0f0f0;
+        --text-color-inverted: #0f0f0f;
         --input-gutter-color: #565656;
         --input-handle-color: #1f1f1f;
         --input-shadow-color: #101010;

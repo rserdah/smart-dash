@@ -5,6 +5,7 @@ const christmasTheme = css`
         --primary-color: green;
         --background-color: #a30303;
         --text-color: rgb(0, 54, 0);
+        --text-color-inverted: #f5f5f5;
     }
 `;
 

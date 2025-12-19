@@ -71,7 +71,7 @@ export default function ToggleButtonGroup(props: ToggleButtonGroupProps) {
                     // Since label is clickable and will trigger the onChange, the custom visual needs to be a child of label, but does not need any interactability
                     <ToggleButton 
                         key={`toggle_button_group_option_${o.label}_${o.value}`}
-                        htmlFor={props.name}
+                        // htmlFor={props.name}
                         $active={value == o.value}
                     >
                         <RadioInput

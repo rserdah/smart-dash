@@ -12,10 +12,14 @@ function createWindow() {
     const win = new BrowserWindow({
         width: 1000,
         height: 800,
+        /* frame: false,  */ /* Hide Windows window frame */
         webPreferences: {
             preload: path.join(__dirname, 'preload.ts')
         }
     });
+
+    // Removes application top menu (also prevents shortcuts, though)
+    // win.removeMenu();
 
     if (process.env.NODE_ENV === 'development') {
         win.loadURL('http://localhost:5173/');
