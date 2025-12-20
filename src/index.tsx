@@ -10,7 +10,9 @@ if (!root) {
 }
 
 ReactDOM.createRoot(root!).render(
-    <AppThemeProvider>
-        <App />
-    </AppThemeProvider>
+    <React.StrictMode>
+        <AppThemeProvider>
+            <App />
+        </AppThemeProvider>
+    </React.StrictMode>
 );
