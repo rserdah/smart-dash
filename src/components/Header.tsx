@@ -1,8 +1,11 @@
 /** @jsxImportSource @emotion/react */
 import React, { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import type { Theme } from '@/theme/types';
+import { baseTheme, themes, ThemeName } from '../theme/index';
+import { useThemeContext } from '../theme/themeContext';
 
 interface HeaderProps {
 }
@@ -60,9 +63,13 @@ const NavButton = styled.button`
     }
 `;
 
+const options = Object.keys(themes);
+
 export default function Header(props: HeaderProps) {
+    const { theme, setTheme } = useThemeContext();
     const navigate = useNavigate();
     const location = useLocation();
+    
 
     return (
         <AppHeader>
@@ -80,7 +87,11 @@ export default function Header(props: HeaderProps) {
                     </NavButton>
                 </FlexRow>
 
-                Dashboard App
+                <span>Dashboard App</span>
+
+                <select css={css`margin: 10px; width: max-content; font-family: "Onest", sans-serif; font-size: 20px;`} value={theme} onChange={e => setTheme(e.target.value as ThemeName)}>
+                    {options.map(x => (<option value={x}>{x}</option>))}
+                </select>
             </AppTitle>
         </AppHeader>
     )

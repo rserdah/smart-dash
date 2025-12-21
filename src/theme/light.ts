@@ -3,7 +3,7 @@ import { css } from '@emotion/react';
 const lightTheme = css`
     :root {
         --background-color: #dddddd;
-        --container-background-color: #e2e2e2ff;
+        --container-background-color: #e2e2e257;
         --text-color: #0f0f0f;
         --text-color-inverted: #f5f5f5;
         --input-gutter-color: #C7C7C7;

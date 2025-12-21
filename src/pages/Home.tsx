@@ -1,27 +1,27 @@
 /** @jsxImportSource @emotion/react */
-import React, { useState, PropsWithChildren, useEffect } from 'react';
-import { MemoryRouter, Routes, Route, NavLink } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { css, useTheme } from '@emotion/react';
-import type { Theme } from '@/theme/types';
-import { baseTheme, themes, ThemeName } from '../theme/index';
-import { useThemeContext } from '../theme/themeContext';
-import Header from '../components/Header';
+import { css } from '@emotion/react';
 import InputKnob from '../components/input/InputKnob';
 import ToggleSwitch from '../components/input/ToggleSwitch';
-import Keyboard from '../components/input/Keyboard';
 import InputText from '../components/input/InputText';
 import ToggleButtonGroup from '../components/input/ToggleButtonGroup';
 import InputLinearSlider from '../components/input/InputLinearSlider';
 import InputCheckbox from '../components/input/InputCheckbox';
 import ToggleButton from '../components/input/ToggleButton';
 
-const options = Object.keys(themes);
-
 // IMPORTANT! styled.element variables CANNOT be defined inside the functional component or else they will unmount every time the functional component re-renders
-const AppBox = styled.div`
+const ImgBackground = styled.img`
+    position: absolute;
+    width: 100%;
+    z-index: -1;
+`;
+
+const Box = styled.div`
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
     width: 100vw;
     height: 100vh;
     font-family: "Onest", sans-serif;
@@ -29,112 +29,148 @@ const AppBox = styled.div`
     font-weight: 500;
     font-style: normal;
     /* background: radial-gradient(hsl(from var(--primary-color) h calc(s * 0.5) calc(l * 0.25)), var(--background-color)); */
-    background: var(--background-color);
     transition: background-color 0.25s ease;
 `;
 
-const AppCenterBox = styled.div`
+const MainContentBox = styled.div`
+    box-sizing: border-box;
     display: flex;
-    flex-direction: column;
-    flex: 1;
-    gap: 20px;
-    align-items: center;
-    justify-content: center;
+    gap: 10px;
+    padding: 10px;
     width: 100%;
+    height: 70%;
+    min-height: 0px;
+    border-radius: 10px;
+    /* background: #ffffff41; */
 `;
 
-const AppLowerBox = styled.div`
-    padding: 0px 10px;
-    max-height: 250px;
-    
-    transition: max-height 0.5s ease;
+const Widget = styled.div`
+    box-sizing: border-box;
+    display: flex;
+    flex: 1;
+    gap: 10px;
+    padding: 10px;
+    width: 100%;
+    min-height: 0px;
+    border: 1px solid white;
+    border-radius: 10px;
+    /* background: var(--container-background-color); */
+    background: #69696910;
+    backdrop-filter: blur(10px) saturate(0.9);
+`;
+
+const WidgetRow = styled.div`
+    box-sizing: border-box;
+    display: flex;
+    gap: 10px;
+    flex: 1;
+    width: 100%;
+    min-height: 0px;
+    border-radius: 10px;
+`;
+
+const WidgetCol = styled.div`
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    width: 100%;
+    min-height: 0px;
+`;
+
+const RoomSelectorBox = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
 `;
 
 export default function Home() {
-    const { theme, setTheme } = useThemeContext();
-
     return (
         <>
-            <select css={css`margin: 10px; width: max-content; font-family: "Onest", sans-serif; font-size: 20px;`} value={theme} onChange={e => setTheme(e.target.value as ThemeName)}>
-                {options.map(x => (<option value={x}>{x}</option>))}
-            </select>
+            <ImgBackground src='src/img/LivingRoomImage_Vecislavas_Popa_Pexels.jpg' />
 
-            {/* <AppCenterBox> */}
-            {/* <InputKnob /> */}
-            {/* <ToggleSwitch /> */}
-            {/* <Keyboard /> */}
-            {/* <InputText /> */}
-            {/* <InputLinearSlider sliderWidthPx={200} /> */}
-            {/* <InputCheckbox name='testCheckbox' /> */}
-            {/* <ToggleButton name='testTogggleButton' onChange={c => console.log('ToggleButton active:', c)} /> */}
+            <Box>
+                {/* <InputKnob /> */}
+                {/* <Keyboard /> */}
+                {/* <InputText /> */}
+                {/* <InputLinearSlider sliderWidthPx={200} /> */}
+                {/* <InputCheckbox name='testCheckbox' /> */}
+                {/* <ToggleButton name='testTogggleButton' onChange={c => console.log('ToggleButton active:', c)} /> */}
 
-            {/* <div css={css`margin-bottom: 100px;`}></div> */}
+                {/* <div css={css`margin-bottom: 100px;`}></div> */}
 
-            {/* <div css={css`box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; gap: 10px; padding: 25px 50px; width: 100%;`}>
-                <div css={css`box-sizing: border-box; display: flex; flex-direction: column; flex: 1; gap: 10px; width: 40%;`}>
-                    <div css={css`display: flex; gap: 10px;`}>
-                        <h3 css={css`flex: 1; margin: 0px;`}>Settings</h3>
+                <MainContentBox>
+                    <div css={css`box-sizing: border-box; display: flex; flex-direction: column; flex-basis: 66%; width: 100%; min-height: 0px; border-radius: 10px; gap: 10px;`}>
+                        <WidgetRow>
+                            <Widget>
+                                <ToggleSwitch />
+                                <span css={css`color: white;`}>Lighting</span>
+                            </Widget>
+                        </WidgetRow>
+
+                        <WidgetRow>
+                            <Widget>
+                                <InputCheckbox name='testCheckbox' />
+                                <span css={css`color: white;`}>Lighting</span>
+                            </Widget>
+                            <Widget>
+                                <ToggleButton name='testTogggleButton' />
+                                <span css={css`color: white;`}>Light</span>
+                            </Widget>
+                            <Widget />
+                            <Widget />
+                        </WidgetRow>
+
+                        <WidgetRow>
+                            <Widget />
+                            <Widget />
+                        </WidgetRow>
                     </div>
 
-                    <div css={css`display: flex; gap: 10px;`}>
-                        <span css={css`flex: 1`}>Other setting</span>
-                        <ToggleSwitch name='testCheckbox' />
-                    </div>
+                    <WidgetCol>
+                        <WidgetCol>
+                            <WidgetRow>
+                                <Widget />
+                                <Widget />
+                            </WidgetRow>
 
-                    <div css={css`display: flex; gap: 10px;`}>
-                        <span css={css`flex: 1`}>Another option for thing</span>
-                        <ToggleSwitch name='testCheckbox' />
-                    </div>
+                            <WidgetRow>
+                                <Widget />
+                                <Widget />
+                            </WidgetRow>
+                        </WidgetCol>
 
-                    <div css={css`display: flex; gap: 10px;`}>
-                        <span css={css`flex: 1`}>Enable for more options</span>
-                        <ToggleSwitch name='testCheckbox' />
-                    </div>
+                        <Widget css={css`position: relative; overflow: hidden;`}>
+                            <ImgBackground src='src/img/LivingRoomImage_Vecislavas_Popa_Pexels.jpg' css={css`top: 0px; left: -45px; width: unset; height: 100%; transform: scale(1.25)`} />
 
-                    <div css={css`--primary-neo-shadow-color: #303030; --secondary-neo-shadow-color: #808080; --primary-neo-shadow-color: #ef1b1b; --secondary-neo-shadow-color: #0141cf; --primary-color: #0141cf; display: flex; align-items: center; justify-content: center; padding: 10px; width: 150px; height: 300px; border: 1px solid var(--primary-neo-shadow-color); border-top-color: var(--secondary-neo-shadow-color); border-left-color: var(--secondary-neo-shadow-color); border-radius: 10px; background: radial-gradient(#212121 10%, #0b0b0b); background: #121212; box-shadow: 3px 3px 8px 0px var(--primary-neo-shadow-color), -3px -3px 8px 0px var(--secondary-neo-shadow-color);`}>
-                        <ToggleButton name='adsad' />
-                    </div>
-                </div>
-            </div> */}
-            {/* </AppCenterBox> */}
+                            <div css={css`display: flex; gap: 8px; align-items: center; justify-content: center; padding: 2px 10px; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                <div css={css`width: 5px; height: 5px; border-radius: 999px; background: #e92323ff; box-shadow: 0px 0px 4px 2px #e92323ff;`}></div>
+                                <span css={css`font-size: 14px;`}>Live</span>
+                            </div>
 
-            {/* <AppLowerBox>
-                </AppLowerBox> */}
+                            <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                <span className='material-symbols-outlined' css={css`font-size: 20px;`}>bolt</span>
+                                <span css={css`font-size: 14px;`}>65W</span>
+                            </div>
 
-            <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; gap: 10px; padding: 10px;`}>
-                <div css={css`box-sizing: border-box; display: flex; flex-direction: column; flex-basis: 66%; width: 100%; min-height: 0px; border-radius: 10px; gap: 10px;`}>
-                    <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; border-radius: 10px; gap: 10px;`}>
-                        <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; border: 1px solid gray; border-radius: 10px; gap: 10px; background: var(--container-background-color);`}></div>
-                    </div>
+                            <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                <span className='material-symbols-outlined' css={css`font-size: 20px;`}>lightbulb_2</span>
+                                <span css={css`font-size: 14px;`}>60%</span>
+                            </div>
 
-                    <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; border-radius: 10px; gap: 10px;`}>
-                        <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; border: 1px solid gray; border-radius: 10px; gap: 10px; background: var(--container-background-color);`}></div>
-                        <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; border: 1px solid gray; border-radius: 10px; gap: 10px; background: var(--container-background-color);`}></div>
-                        <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; border: 1px solid gray; border-radius: 10px; gap: 10px; background: var(--container-background-color);`}></div>
-                        <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; border: 1px solid gray; border-radius: 10px; gap: 10px; background: var(--container-background-color);`}></div>
-                    </div>
+                            <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                <span className='material-symbols-outlined' css={css`font-size: 20px;`}>thermometer</span>
+                                <span css={css`font-size: 14px;`}>78°F</span>
+                            </div>
+                        </Widget>
+                    </WidgetCol>
+                </MainContentBox>
 
-                    <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; border-radius: 10px; gap: 10px;`}>
-                        <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; border: 1px solid gray; border-radius: 10px; gap: 10px; background: var(--container-background-color);`}></div>
-                        <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; border: 1px solid gray; border-radius: 10px; gap: 10px; background: var(--container-background-color);`}></div>
-                    </div>
-                </div>
-                <div css={css`box-sizing: border-box; display: flex; flex-direction: column; flex: 1; width: 100%; min-height: 0px; border-radius: 10px; gap: 10px;`}>
-                    <div css={css`box-sizing: border-box; display: flex; flex-direction: column; flex: 1; width: 100%; min-height: 0px; border-radius: 10px; gap: 10px;`}>
-                        <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; border-radius: 10px; gap: 10px;`}>
-                            <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; border: 1px solid gray; border-radius: 10px; gap: 10px; background: var(--container-background-color);`}></div>
-                            <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; border: 1px solid gray; border-radius: 10px; gap: 10px; background: var(--container-background-color);`}></div>
-                        </div>
-
-                        <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; border-radius: 10px; gap: 10px;`}>
-                            <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; border: 1px solid gray; border-radius: 10px; gap: 10px; background: var(--container-background-color);`}></div>
-                            <div css={css`box-sizing: border-box; display: flex; flex: 1; width: 100%; min-height: 0px; border: 1px solid gray; border-radius: 10px; gap: 10px; background: var(--container-background-color);`}></div>
-                        </div>
-                    </div>
-
-                    <div css={css`box-sizing: border-box; display: flex; flex-basis: 40%; width: 100%; min-height: 0px; border: 1px solid gray; border-radius: 10px; gap: 10px; background: var(--container-background-color);`}></div>
-                </div>
-            </div>
+                <RoomSelectorBox>
+                    <ToggleButtonGroup name='togglebuttongroup1' options={[{ label: 'Home', value: 'home' }, { label: 'Lighting', value: 'lighting' }, { label: 'Settings', value: 'settings' }, ]} />
+                </RoomSelectorBox>
+            </Box>
         </>
     )
 }
