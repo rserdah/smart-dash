@@ -8,6 +8,9 @@ import ToggleButtonGroup from '../components/input/ToggleButtonGroup';
 import InputLinearSlider from '../components/input/InputLinearSlider';
 import InputCheckbox from '../components/input/InputCheckbox';
 import ToggleButton from '../components/input/ToggleButton';
+import { useModal } from '@/modals/ModalContext';
+import { ModalProps, ModalBody, ModalFooter, ModalFooterBtn } from '@/modals/ModalShell';
+import { useEffect, useState } from 'react';
 
 // IMPORTANT! styled.element variables CANNOT be defined inside the functional component or else they will unmount every time the functional component re-renders
 const ImgBackground = styled.img`
@@ -85,7 +88,25 @@ const RoomSelectorBox = styled.div`
     justify-content: center;
 `;
 
+/* export */ function ConfirmModal({ message, onConfirm, onClose }: ModalProps) {
+    return (
+        <>
+            <ModalBody>
+                <p>{message}</p>
+            </ModalBody>
+
+            <ModalFooter>
+                <ModalFooterBtn onClick={() => { onClose?.(); }}>Cancel</ModalFooterBtn>
+                <ModalFooterBtn onClick={async () => { const result = await onConfirm(); result && onClose?.(); }}>Confirm</ModalFooterBtn>
+            </ModalFooter>
+        </>
+    )
+}
+
 export default function Home() {
+    const [checked, setChecked] = useState(false);
+    const modal = useModal();
+
     return (
         <>
             <ImgBackground src='src/img/LivingRoomImage_Vecislavas_Popa_Pexels.jpg' />
@@ -98,14 +119,12 @@ export default function Home() {
                 {/* <InputCheckbox name='testCheckbox' /> */}
                 {/* <ToggleButton name='testTogggleButton' onChange={c => console.log('ToggleButton active:', c)} /> */}
 
-                {/* <div css={css`margin-bottom: 100px;`}></div> */}
-
                 <MainContentBox>
                     <div css={css`box-sizing: border-box; display: flex; flex-direction: column; flex-basis: 66%; width: 100%; min-height: 0px; border-radius: 10px; gap: 10px;`}>
                         <WidgetRow>
                             <Widget>
-                                <ToggleSwitch />
-                                <span css={css`color: white;`}>Lighting</span>
+                                <ToggleSwitch checked={checked} onToggle={checked => !Boolean(console.log(checked)) && modal.open(ConfirmModal, { title: 'Are you sure?', message: 'Are you sure you want to flip this switch?', onConfirm: () => { setChecked(c => !c); return true; } })} />
+                                <span css={css`color: white;`}>Toggle Modal</span>
                             </Widget>
                         </WidgetRow>
 
