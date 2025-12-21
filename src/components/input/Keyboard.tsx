@@ -41,7 +41,6 @@ const KeyboardKey = styled.button`
     max-height: var(--keyboard-key-height);
     border: none;
     border-radius: calc(var(--keyboard-base-unit) * 0.08);
-    font-family: "Onest", sans-serif;
     font-size: calc(var(--keyboard-base-unit) * 0.24);
     font-weight: 500;
     background: var(--input-keyboard-key-background);

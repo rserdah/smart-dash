@@ -19,10 +19,6 @@ const SidebarBox = styled.div`
     padding: 15px 0px;
     margin: 0px;
     width: 50px;
-    font-family: "Onest", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
     border: 1px solid white;
     border-radius: 999px;
     color: white;

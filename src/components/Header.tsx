@@ -28,10 +28,6 @@ const AppTitle = styled.h1`
     align-items: center;
     justify-content: center;
     margin: 0px;
-    font-family: "Onest", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
     color: white;
 `;
 
@@ -89,7 +85,7 @@ export default function Header(props: HeaderProps) {
 
                 <span>Dashboard App</span>
 
-                <select css={css`margin: 10px; width: max-content; font-family: "Onest", sans-serif; font-size: 20px;`} value={theme} onChange={e => setTheme(e.target.value as ThemeName)}>
+                <select css={css`margin: 10px; width: max-content; font-size: 20px;`} value={theme} onChange={e => setTheme(e.target.value as ThemeName)}>
                     {options.map(x => (<option value={x}>{x}</option>))}
                 </select>
             </AppTitle>

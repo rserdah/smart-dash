@@ -15,11 +15,7 @@ const InputTextInput = styled.input`
     height: 28px;
     border: none;
     border-radius: 8px;
-    font-family: "Onest", sans-serif;
-    font-size: 20px;
     font-weight: 300;
-    font-style: normal;
-    font-optical-sizing: auto;
     background: var(--input-handle-color);
     color: var(--text-color);
 

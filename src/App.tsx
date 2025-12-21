@@ -16,10 +16,7 @@ const AppBox = styled.div`
     flex-direction: row;
     width: 100vw;
     height: 100vh;
-    font-family: "Onest", sans-serif;
-    font-optical-sizing: auto;
     font-weight: 500;
-    font-style: normal;
     /* background: radial-gradient(hsl(from var(--primary-color) h calc(s * 0.5) calc(l * 0.25)), var(--background-color)); */
     /* background: var(--background-color); */
     transition: background-color 0.25s ease;
