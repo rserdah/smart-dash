@@ -25,7 +25,7 @@ const SidebarBox = styled.div`
     backdrop-filter: blur(2px) saturate(0.95);
 `;
 
-const sidebarLinkCss = css`
+const SidebarIconBtn = styled.span`
     --sidebar-link-size: 32px;
     display: inline-flex;
     align-items: center;
@@ -51,10 +51,10 @@ export default function Sidebar(props: SidebarProps) {
     return (
         <nav>
             <SidebarBox>
-                <NavLink to='/'><span className='material-symbols-outlined' css={sidebarLinkCss}>search</span></NavLink>
-                <NavLink to='/'><span className='material-symbols-outlined' css={sidebarLinkCss}>home</span></NavLink>
-                <NavLink to='/'><span className='material-symbols-outlined' css={sidebarLinkCss}>apps</span></NavLink>
-                <NavLink to='/settings'><span className='material-symbols-outlined' css={sidebarLinkCss}>settings</span></NavLink>
+                <NavLink to='/'><SidebarIconBtn className='material-symbols-outlined'>search</SidebarIconBtn></NavLink>
+                <NavLink to='/'><SidebarIconBtn className='material-symbols-outlined'>home</SidebarIconBtn></NavLink>
+                <NavLink to='/'><SidebarIconBtn className='material-symbols-outlined'>apps</SidebarIconBtn></NavLink>
+                <NavLink to='/settings'><SidebarIconBtn className='material-symbols-outlined'>settings</SidebarIconBtn></NavLink>
             </SidebarBox>
         </nav>
     )

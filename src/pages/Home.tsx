@@ -15,7 +15,7 @@ import { useEffect, useState } from 'react';
 // IMPORTANT! styled.element variables CANNOT be defined inside the functional component or else they will unmount every time the functional component re-renders
 const ImgBackground = styled.img`
     position: absolute;
-    width: 100%;
+    height: 100%;
     z-index: -1;
 `;
 
@@ -81,8 +81,34 @@ const WidgetCol = styled.div`
 
 const RoomSelectorBox = styled.div`
     display: flex;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
+    gap: 5px;
+    padding: 5px;
+    margin: 0px;
+    height: max-content;
+    max-height: max-content;
+    border: 1px solid white;
+    border-radius: 999px;
+    color: white;
+    backdrop-filter: blur(2px) saturate(0.95);
+`;
+
+const RoomSelectorBtn = styled.button`
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: white;
+
+    &:hover {
+        background: #ffffff2f;
+    }
 `;
 
 /* export */ function ConfirmModal({ message, onConfirm, onClose }: ModalProps) {
@@ -100,13 +126,42 @@ const RoomSelectorBox = styled.div`
     )
 }
 
+type RoomData = {
+    id: string;
+    name: string;
+    img: string;
+};
+
+const rooms: RoomData[] = [
+    {
+        id: 'living_room', 
+        name: 'Living Room', 
+        img: 'src/img/LivingRoomImage_Vecislavas_Popa_Pexels.jpg', 
+    }, 
+    {
+        id: 'dining_room', 
+        name: 'Dining Room', 
+        img: 'src/img/DiningRoomImage_Jean_van_der_Meulen_Pexels.jpg', 
+    }, 
+    {
+        id: 'bedroom', 
+        name: 'Living Room', 
+        img: 'src/img/BedroomImage_Jean_van_der_Meulen_Pexels.jpg', 
+    }, 
+];
+
 export default function Home() {
+    const [roomId, setRoomId] = useState('living_room');
     const [checked, setChecked] = useState(false);
     const modal = useModal();
 
+    const currentRoom = rooms.find(x => x.id == roomId);
+
     return (
         <>
-            <ImgBackground src='src/img/LivingRoomImage_Vecislavas_Popa_Pexels.jpg' />
+            <div css={css`position: absolute; z-index: -1; min-width: 100vw; max-width: 100vw; min-height: 100vh; max-height: 100vh; overflow: hidden;`}>
+                <ImgBackground src={currentRoom?.img} />
+            </div>
 
             <Box>
                 {/* <InputKnob /> */}
@@ -158,7 +213,7 @@ export default function Home() {
                         </WidgetCol>
 
                         <Widget css={css`position: relative; overflow: hidden;`}>
-                            <ImgBackground src='src/img/LivingRoomImage_Vecislavas_Popa_Pexels.jpg' css={css`top: 0px; left: -45px; width: unset; height: 100%; transform: scale(1.25)`} />
+                            <ImgBackground src={currentRoom?.img} css={css`top: 0px; left: -45px; width: unset; height: 100%; transform: scale(1.25)`} />
 
                             <div css={css`display: flex; gap: 8px; align-items: center; justify-content: center; padding: 2px 10px; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
                                 <div css={css`width: 5px; height: 5px; border-radius: 999px; background: #e92323ff; box-shadow: 0px 0px 4px 2px #e92323ff;`}></div>
@@ -184,7 +239,16 @@ export default function Home() {
                 </MainContentBox>
 
                 <RoomSelectorBox>
-                    <ToggleButtonGroup name='togglebuttongroup1' options={[{ label: 'Home', value: 'home' }, { label: 'Lighting', value: 'lighting' }, { label: 'Settings', value: 'settings' }, ]} />
+                    {/* <ToggleButtonGroup name='togglebuttongroup1' options={[{ label: 'Home', value: 'home' }, { label: 'Lighting', value: 'lighting' }, { label: 'Settings', value: 'settings' }, ]} /> */}
+                    
+                    {
+                        rooms.map(x => (
+                            <RoomSelectorBtn onClick={e => setRoomId(r => x.id)}>{x.name}</RoomSelectorBtn>
+                        ))
+                    }
+                    
+                    <RoomSelectorBtn>Porch</RoomSelectorBtn>
+                    <RoomSelectorBtn className='material-symbols-outlined' css={css` --sidebar-link-size: 32px; display: inline-flex; align-items: center; justify-content: center; padding: 2px; min-width: var(--sidebar-link-size); width: var(--sidebar-link-size); max-width: var(--sidebar-link-size); min-height: var(--sidebar-link-size); height: var(--sidebar-link-size); max-height: var(--sidebar-link-size); font-size: 28px; border-radius: 999px; background: transparent; color: white; &:hover { background: #ffffff2f; } `}>add</RoomSelectorBtn>
                 </RoomSelectorBox>
             </Box>
         </>
