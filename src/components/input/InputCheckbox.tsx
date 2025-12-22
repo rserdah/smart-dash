@@ -2,6 +2,7 @@
 import React, { useState, useRef, ReactNode } from 'react';
 import styled from '@emotion/styled';
 import { css, SerializedStyles } from '@emotion/react';
+import MaterialIcon from '../MaterialIcon';
 
 interface InputCheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, | 'type' | 'name' | 'checked' | 'onChange'> {
     name: string, 
@@ -97,7 +98,7 @@ export default function InputCheckbox(props: InputCheckboxProps) {
             icon = props.icon;
         }
         else {
-            icon = <span className='material-symbols-outlined' css={css`font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24; font-size: var(--input-checkbox-font-size); ${!checked ? css`display: none` : ''}`}>check</span>
+            icon = <MaterialIcon icon='check' addCssGetter={() => css`font-size: var(--input-checkbox-font-size); ${!checked ? css`display: none` : ''}`} />
         }
 
         return icon;

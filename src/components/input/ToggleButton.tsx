@@ -4,12 +4,14 @@ import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import InputCheckbox from './InputCheckbox';
 
-interface ToggleButtonProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, | 'type' | 'name' | 'checked' | 'onChange'> {
-    name: string, 
-    checked?: boolean, 
-    onChange?: (checked: boolean) => void, 
-    icon?: ReactNode | ((checked: boolean) => ReactNode), 
+interface ToggleButtonBaseProps {
+    name: string;
+    checked?: boolean;
+    onChange?: (checked: boolean) => void;
+    icon?: ReactNode | ((checked: boolean) => ReactNode);
 }
+
+type ToggleButtonProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, keyof ToggleButtonBaseProps> & ToggleButtonBaseProps;
 
 const ToggleButtonBox = styled.div`
     --input-checkbox-padding: 2px;
@@ -93,12 +95,6 @@ export default function ToggleButton(props: ToggleButtonProps) {
         if(!controlled) _setChecked(checked);
 
         props.onChange?.(checked);
-    };
-
-    const getIcon = (checked: boolean) => {
-        return (
-            <ButtonIcon className='material-symbols-outlined' $checked={checked}>power_settings_new</ButtonIcon>
-        )
     };
 
     return (

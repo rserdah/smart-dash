@@ -6,6 +6,7 @@ import styled from '@emotion/styled';
 import type { Theme } from '@/theme/types';
 import { baseTheme, themes, ThemeName } from '../theme/index';
 import { useThemeContext } from '../theme/themeContext';
+import MaterialIcon from './MaterialIcon';
 
 interface HeaderProps {
 }
@@ -76,10 +77,10 @@ export default function Header(props: HeaderProps) {
 
                 <FlexRow>
                     <NavButton onClick={() => navigate(-1)}>
-                        <span className='material-symbols-outlined' css={css`font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24;`}>arrow_back</span>
+                        <MaterialIcon icon='arrow_back' wght={200} />
                     </NavButton>
                     <NavButton onClick={() => navigate(1)}>
-                        <span className='material-symbols-outlined' css={css`font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24;`}>arrow_forward</span>
+                        <MaterialIcon icon='arrow_forward' wght={200} />
                     </NavButton>
                 </FlexRow>
 

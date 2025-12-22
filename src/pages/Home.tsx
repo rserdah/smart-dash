@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
+import Widget from '@/components/Widget';
 import InputKnob from '../components/input/InputKnob';
 import ToggleSwitch from '../components/input/ToggleSwitch';
 import InputText from '../components/input/InputText';
@@ -11,6 +12,7 @@ import ToggleButton from '../components/input/ToggleButton';
 import { useModal } from '@/modals/ModalContext';
 import { ModalProps, ModalBody, ModalFooter, ModalFooterBtn } from '@/modals/ModalShell';
 import { useEffect, useState } from 'react';
+import MaterialIcon from '@/components/MaterialIcon';
 
 // IMPORTANT! styled.element variables CANNOT be defined inside the functional component or else they will unmount every time the functional component re-renders
 const ImgBackground = styled.img`
@@ -42,21 +44,6 @@ const MainContentBox = styled.div`
     min-height: 0px;
     border-radius: 10px;
     /* background: #ffffff41; */
-`;
-
-const Widget = styled.div`
-    box-sizing: border-box;
-    display: flex;
-    flex: 1;
-    gap: 10px;
-    padding: 10px;
-    width: 100%;
-    min-height: 0px;
-    border: 1px solid white;
-    border-radius: 10px;
-    /* background: var(--container-background-color); */
-    background: #69696910;
-    backdrop-filter: blur(10px) saturate(0.9);
 `;
 
 const WidgetRow = styled.div`
@@ -174,65 +161,79 @@ export default function Home() {
                 <MainContentBox>
                     <div css={css`box-sizing: border-box; display: flex; flex-direction: column; flex-basis: 66%; width: 100%; min-height: 0px; border-radius: 10px; gap: 10px;`}>
                         <WidgetRow>
-                            <Widget>
-                                <ToggleSwitch checked={checked} onToggle={checked => !Boolean(console.log(checked)) && modal.open(ConfirmModal, { title: 'Are you sure?', message: 'Are you sure you want to flip this switch?', onConfirm: () => { setChecked(c => !c); return true; } })} />
-                                <span css={css`color: white;`}>Toggle Modal</span>
+                            <Widget
+                                title='test1'
+                                header={<div css={css`display: flex; flex-direction: row; justify-content: space-between; gap: 10px;`}>
+                                    <span css={css`color: white;`}>Toggle Modal</span>
+                                    <ToggleSwitch checked={checked} onToggle={checked => !Boolean(console.log(checked)) && modal.open(ConfirmModal, { title: 'Are you sure?', message: 'Are you sure you want to flip this switch?', onConfirm: () => { setChecked(c => !c); return true; } })} />
+                                </div>}
+                            >
                             </Widget>
                         </WidgetRow>
 
                         <WidgetRow>
-                            <Widget>
-                                <InputCheckbox name='testCheckbox' />
-                                <span css={css`color: white;`}>Lighting</span>
+                            <Widget
+                                title='test2'
+                                header={<div css={css`display: flex; flex-direction: row; gap: 10px;`}>
+
+                                    <InputCheckbox name='testCheckbox' />
+                                    <span css={css`color: white;`}>Lighting</span>
+                                </div>}
+                            >
                             </Widget>
-                            <Widget>
-                                <ToggleButton name='testTogggleButton' />
-                                <span css={css`color: white;`}>Light</span>
+                            <Widget title='Light'>
+                                <div css={css`display: flex; align-items: center; justify-content: center; height: 100%;`}>
+                                    <ToggleButton name='testTogggleButton' />
+                                </div>
                             </Widget>
-                            <Widget />
-                            <Widget />
+                            <Widget title='test3' />
+                            <Widget title='test4' />
                         </WidgetRow>
 
                         <WidgetRow>
-                            <Widget />
-                            <Widget />
+                            <Widget title='test5' />
+                            <Widget title='test6' addCssGetter={() => css`background: #00aeff91;`} />
                         </WidgetRow>
                     </div>
 
                     <WidgetCol>
                         <WidgetCol>
                             <WidgetRow>
-                                <Widget />
-                                <Widget />
+                                <Widget title='test7' />
+                                <Widget title='test8' />
                             </WidgetRow>
 
                             <WidgetRow>
-                                <Widget />
-                                <Widget />
+                                <Widget title='test9' />
+                                <Widget title='test10' />
                             </WidgetRow>
                         </WidgetCol>
 
-                        <Widget css={css`position: relative; overflow: hidden;`}>
+                        <Widget custom>
+                            {/* clear_day, cloud, foggy, partly_cloudy_day, partly_cloudy_night, rainy, sunny, thunderstorm */}
+                            
                             <ImgBackground src={currentRoom?.img} css={css`top: 0px; left: -45px; width: unset; height: 100%; transform: scale(1.25)`} />
 
-                            <div css={css`display: flex; gap: 8px; align-items: center; justify-content: center; padding: 2px 10px; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
-                                <div css={css`width: 5px; height: 5px; border-radius: 999px; background: #e92323ff; box-shadow: 0px 0px 4px 2px #e92323ff;`}></div>
-                                <span css={css`font-size: 14px;`}>Live</span>
-                            </div>
+                            <div css={css`display: flex; gap: 5px;`}>
+                                <div css={css`display: flex; gap: 8px; align-items: center; justify-content: center; padding: 2px 10px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                    <div css={css`width: 5px; height: 5px; border-radius: 999px; background: #e92323ff; box-shadow: 0px 0px 4px 2px #e92323ff;`}></div>
+                                    <span css={css`font-size: 14px;`}>Live</span>
+                                </div>
 
-                            <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
-                                <span className='material-symbols-outlined' css={css`font-size: 20px;`}>bolt</span>
-                                <span css={css`font-size: 14px;`}>65W</span>
-                            </div>
+                                <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                    <MaterialIcon icon='bolt' addCssGetter={() => css`font-size: 20px;`} />
+                                    <span css={css`font-size: 14px;`}>65W</span>
+                                </div>
 
-                            <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
-                                <span className='material-symbols-outlined' css={css`font-size: 20px;`}>lightbulb_2</span>
-                                <span css={css`font-size: 14px;`}>60%</span>
-                            </div>
+                                <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                    <MaterialIcon icon='lightbulb_2' addCssGetter={() => css`font-size: 20px;`} />
+                                    <span css={css`font-size: 14px;`}>60%</span>
+                                </div>
 
-                            <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
-                                <span className='material-symbols-outlined' css={css`font-size: 20px;`}>thermometer</span>
-                                <span css={css`font-size: 14px;`}>78°F</span>
+                                <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                    <MaterialIcon icon='thermometer' addCssGetter={() => css`font-size: 20px;`} />
+                                    <span css={css`font-size: 14px;`}>78°F</span>
+                                </div>
                             </div>
                         </Widget>
                     </WidgetCol>
@@ -248,7 +249,7 @@ export default function Home() {
                     }
                     
                     <RoomSelectorBtn>Porch</RoomSelectorBtn>
-                    <RoomSelectorBtn className='material-symbols-outlined' css={css` --sidebar-link-size: 32px; display: inline-flex; align-items: center; justify-content: center; padding: 2px; min-width: var(--sidebar-link-size); width: var(--sidebar-link-size); max-width: var(--sidebar-link-size); min-height: var(--sidebar-link-size); height: var(--sidebar-link-size); max-height: var(--sidebar-link-size); font-size: 28px; border-radius: 999px; background: transparent; color: white; &:hover { background: #ffffff2f; } `}>add</RoomSelectorBtn>
+                    <RoomSelectorBtn className='material-symbols-outlined' css={css`--sidebar-link-size: 32px; display: inline-flex; align-items: center; justify-content: center; padding: 2px; min-width: var(--sidebar-link-size); width: var(--sidebar-link-size); max-width: var(--sidebar-link-size); min-height: var(--sidebar-link-size); height: var(--sidebar-link-size); max-height: var(--sidebar-link-size); font-size: 28px; border-radius: 999px; background: transparent; color: white; &:hover { background: #ffffff2f; }`}>add</RoomSelectorBtn>
                 </RoomSelectorBox>
             </Box>
         </>

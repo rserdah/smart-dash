@@ -6,6 +6,7 @@ import styled from '@emotion/styled';
 import type { Theme } from '@/theme/types';
 import { baseTheme, themes, ThemeName } from '../theme/index';
 import { useThemeContext } from '../theme/themeContext';
+import MaterialIcon from './MaterialIcon';
 
 interface SidebarProps {
 }
@@ -25,7 +26,7 @@ const SidebarBox = styled.div`
     backdrop-filter: blur(2px) saturate(0.95);
 `;
 
-const SidebarIconBtn = styled.span`
+const iconStyleGetter = () => css`
     --sidebar-link-size: 32px;
     display: inline-flex;
     align-items: center;
@@ -51,10 +52,10 @@ export default function Sidebar(props: SidebarProps) {
     return (
         <nav>
             <SidebarBox>
-                <NavLink to='/'><SidebarIconBtn className='material-symbols-outlined'>search</SidebarIconBtn></NavLink>
-                <NavLink to='/'><SidebarIconBtn className='material-symbols-outlined'>home</SidebarIconBtn></NavLink>
-                <NavLink to='/'><SidebarIconBtn className='material-symbols-outlined'>apps</SidebarIconBtn></NavLink>
-                <NavLink to='/settings'><SidebarIconBtn className='material-symbols-outlined'>settings</SidebarIconBtn></NavLink>
+                <NavLink to='/'><MaterialIcon icon='search' addCssGetter={iconStyleGetter} /></NavLink>
+                <NavLink to='/'><MaterialIcon icon='home' addCssGetter={iconStyleGetter} /></NavLink>
+                <NavLink to='/'><MaterialIcon icon='apps' addCssGetter={iconStyleGetter} /></NavLink>
+                <NavLink to='/settings'><MaterialIcon icon='settings' addCssGetter={iconStyleGetter} /></NavLink>
             </SidebarBox>
         </nav>
     )
