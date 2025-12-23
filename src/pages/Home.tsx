@@ -46,6 +46,24 @@ const MainContentBox = styled.div`
     /* background: #ffffff41; */
 `;
 
+const DashboardGrid = styled.div`
+    box-sizing: border-box;
+    display: grid;
+    gap: 10px;
+    align-content: start;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: repeat(6, minmax(0, 1fr));
+    padding: 0px;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+`;
+
+const WidgetSlot = styled.div<{ $col: number, $colSpan: number, $row: number, $rowSpan: number }>`
+    grid-column: ${p => `${p.$col} / span ${p.$colSpan}`};
+    grid-row: ${p => `${p.$row} / span ${p.$rowSpan}`};
+`;
+
 const WidgetRow = styled.div`
     box-sizing: border-box;
     display: flex;
@@ -151,46 +169,68 @@ export default function Home() {
             </div>
 
             <Box>
-                {/* <InputKnob /> */}
                 {/* <Keyboard /> */}
-                {/* <InputText /> */}
-                {/* <InputCheckbox name='testCheckbox' /> */}
-                {/* <ToggleButton name='testToggleButton' onChange={c => console.log('ToggleButton active:', c)} /> */}
 
                 <MainContentBox>
-                    <div css={css`box-sizing: border-box; display: flex; flex-direction: column; flex-basis: 66%; width: 100%; min-height: 0px; border-radius: 10px; gap: 10px;`}>
-                        <WidgetRow>
+                    <DashboardGrid>
+                        <WidgetSlot $col={1} $row={1} $colSpan={8} $rowSpan={2}>
                             <Widget
-                                title='test1'
+                                addCssGetter={() => css`height: 100%;`}
                                 header={<div css={css`display: flex; flex-direction: row; justify-content: space-between; gap: 10px;`}>
                                     <span css={css`color: white;`}>Toggle Modal</span>
                                     <ToggleSwitch checked={checked} onToggle={checked => !Boolean(console.log(checked)) && modal.open(ConfirmModal, { title: 'Are you sure?', message: 'Are you sure you want to flip this switch?', onConfirm: () => { setChecked(c => !c); return true; } })} />
                                 </div>}
                             >
                             </Widget>
-                        </WidgetRow>
+                        </WidgetSlot>
 
-                        <WidgetRow>
+                        <WidgetSlot $col={9} $row={1} $colSpan={2} $rowSpan={2}>
+                            <Widget addCssGetter={() => css`height: 100%;`} title='test7' />
+                        </WidgetSlot>
+
+                        <WidgetSlot $col={11} $row={1} $colSpan={2} $rowSpan={2}>
+                            <Widget addCssGetter={() => css`height: 100%;`} title='test8' />
+                        </WidgetSlot>
+
+                        <WidgetSlot $col={1} $row={3} $colSpan={2} $rowSpan={2}>                            
                             <Widget
-                                title='test2'
+                                addCssGetter={() => css`height: 100%;`}
                                 header={<div css={css`display: flex; flex-direction: row; gap: 10px;`}>
-
                                     <InputCheckbox name='testCheckbox' />
                                     <span css={css`color: white;`}>Lighting</span>
                                 </div>}
                             >
                             </Widget>
-                            <Widget title='Light'>
+                        </WidgetSlot>
+
+                        <WidgetSlot $col={3} $row={3} $colSpan={2} $rowSpan={2}>
+                            <Widget title='Light' addCssGetter={() => css`height: 100%;`}>
                                 <div css={css`display: flex; align-items: center; justify-content: center; height: 100%;`}>
                                     <ToggleButton name='testToggleButton' />
                                 </div>
                             </Widget>
-                            <Widget title='test3' />
-                            <Widget title='test4' />
-                        </WidgetRow>
+                        </WidgetSlot>
 
-                        <WidgetRow>
-                            <Widget title='test5' custom>
+                        <WidgetSlot $col={5} $row={3} $colSpan={2} $rowSpan={2}>
+                            <Widget title='test3' addCssGetter={() => css`height: 100%;`}>
+                                <div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}>
+                                    <InputKnob />
+                                </div>
+                            </Widget>
+                        </WidgetSlot>
+
+                        <WidgetSlot $col={7} $row={3} $colSpan={2} $rowSpan={2}>
+                            <Widget title='test4' addCssGetter={() => css`height: 100%;`} />
+                        </WidgetSlot>
+
+                        <WidgetSlot $col={9} $row={3} $colSpan={4} $rowSpan={1}>
+                            <Widget title='new test' addCssGetter={() => css`height: 100%;`}>
+                                <InputText />
+                            </Widget>
+                        </WidgetSlot>
+
+                        <WidgetSlot $col={1} $row={5} $colSpan={4} $rowSpan={2}>
+                            <Widget addCssGetter={() => css`height: 100%;`} custom>
                                 <div css={css`box-sizing: border-box; display: flex; padding: 10px; padding-top: 0px; flex: 1; width: 100%; max-width: 100%; min-height: 0px; align-items: flex-end;`}>
                                     <div css={css`display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; height: 100%;`}>
                                         <span css={css`display: flex; flex-direction: row; width: 100%; color: white;`}>Desk Lamp</span>
@@ -205,12 +245,13 @@ export default function Home() {
                                     </div>
                                 </div>
                             </Widget>
+                        </WidgetSlot>
+
+                        <WidgetSlot $col={5} $row={5} $colSpan={4} $rowSpan={2}>
                             <Widget
                                 title='test6'
-                                addCssGetter={() => css`background: #00aeff91; border-color: #70d2ffff; background: radial-gradient(#96bcde 60%, #5a96c6); background-size: 1000px 1000px; background-repeat: no-repeat;`}
+                                addCssGetter={() => css`height: 100%; background: #00aeff91; border-color: #70d2ffff; background: radial-gradient(#96bcde 60%, #5a96c6); background-size: 1000px 1000px; background-repeat: no-repeat;`}
                                 header={<>
-                                    {/* clear_day, cloud, foggy, partly_cloudy_day, partly_cloudy_night, rainy, sunny, thunderstorm */}
-
                                     <div css={css`display: flex; flex-direction: column; color: white;`}>
                                         <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
                                             <MaterialIcon icon='partly_cloudy_day' wght={300} addCssGetter={() => css`font-size: 2.5rem; color: yellow;`} />
@@ -235,48 +276,36 @@ export default function Home() {
                                     }
                                 </div>
                             </Widget>
-                        </WidgetRow>
-                    </div>
+                        </WidgetSlot>
 
-                    <WidgetCol>
-                        <WidgetCol>
-                            <WidgetRow>
-                                <Widget title='test7' />
-                                <Widget title='test8' />
-                            </WidgetRow>
+                        <WidgetSlot $col={9} $row={4} $colSpan={4} $rowSpan={3}>
+                            <Widget addCssGetter={() => css`height: 100%;`} custom>
+                                <ImgBackground src={currentRoom?.img} css={css`top: 0px; left: -45px; width: unset; height: 100%; transform: scale(1.25);`} />
 
-                            <WidgetRow>
-                                <Widget title='test9' />
-                                <Widget title='test10' />
-                            </WidgetRow>
-                        </WidgetCol>
+                                <div css={css`display: flex; gap: 5px;`}>
+                                    <div css={css`display: flex; gap: 8px; align-items: center; justify-content: center; padding: 2px 10px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                        <div css={css`width: 5px; height: 5px; border-radius: 999px; background: #e92323ff; box-shadow: 0px 0px 4px 2px #e92323ff;`}></div>
+                                        <span css={css`font-size: 14px;`}>Live</span>
+                                    </div>
 
-                        <Widget custom>
-                            <ImgBackground src={currentRoom?.img} css={css`top: 0px; left: -45px; width: unset; height: 100%; transform: scale(1.25);`} />
+                                    <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                        <MaterialIcon icon='bolt' addCssGetter={() => css`font-size: 20px;`} />
+                                        <span css={css`font-size: 14px;`}>65W</span>
+                                    </div>
 
-                            <div css={css`display: flex; gap: 5px;`}>
-                                <div css={css`display: flex; gap: 8px; align-items: center; justify-content: center; padding: 2px 10px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
-                                    <div css={css`width: 5px; height: 5px; border-radius: 999px; background: #e92323ff; box-shadow: 0px 0px 4px 2px #e92323ff;`}></div>
-                                    <span css={css`font-size: 14px;`}>Live</span>
+                                    <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                        <MaterialIcon icon='lightbulb_2' addCssGetter={() => css`font-size: 20px;`} />
+                                        <span css={css`font-size: 14px;`}>60%</span>
+                                    </div>
+
+                                    <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                        <MaterialIcon icon='thermometer' addCssGetter={() => css`font-size: 20px;`} />
+                                        <span css={css`font-size: 14px;`}>78°F</span>
+                                    </div>
                                 </div>
-
-                                <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
-                                    <MaterialIcon icon='bolt' addCssGetter={() => css`font-size: 20px;`} />
-                                    <span css={css`font-size: 14px;`}>65W</span>
-                                </div>
-
-                                <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
-                                    <MaterialIcon icon='lightbulb_2' addCssGetter={() => css`font-size: 20px;`} />
-                                    <span css={css`font-size: 14px;`}>60%</span>
-                                </div>
-
-                                <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
-                                    <MaterialIcon icon='thermometer' addCssGetter={() => css`font-size: 20px;`} />
-                                    <span css={css`font-size: 14px;`}>78°F</span>
-                                </div>
-                            </div>
-                        </Widget>
-                    </WidgetCol>
+                            </Widget>
+                        </WidgetSlot>
+                    </DashboardGrid>
                 </MainContentBox>
 
                 <RoomSelectorBox>
