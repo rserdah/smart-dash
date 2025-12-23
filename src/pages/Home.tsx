@@ -82,7 +82,7 @@ const RoomSelectorBox = styled.div`
     backdrop-filter: blur(2px) saturate(0.95);
 `;
 
-const RoomSelectorBtn = styled.button`
+const RoomSelectorBtn = styled.button<{ $active?: boolean }>`
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -90,7 +90,7 @@ const RoomSelectorBtn = styled.button`
     font-size: 16px;
     border: none;
     border-radius: 999px;
-    background: transparent;
+    background: ${p => p.$active ? '#ffffff50' : 'transparent'};
     color: white;
 
     &:hover {
@@ -132,7 +132,7 @@ const rooms: RoomData[] = [
     }, 
     {
         id: 'bedroom', 
-        name: 'Living Room', 
+        name: 'Bedroom', 
         img: 'src/img/BedroomImage_Jean_van_der_Meulen_Pexels.jpg', 
     }, 
 ];
@@ -154,9 +154,8 @@ export default function Home() {
                 {/* <InputKnob /> */}
                 {/* <Keyboard /> */}
                 {/* <InputText /> */}
-                {/* <InputLinearSlider sliderWidthPx={200} /> */}
                 {/* <InputCheckbox name='testCheckbox' /> */}
-                {/* <ToggleButton name='testTogggleButton' onChange={c => console.log('ToggleButton active:', c)} /> */}
+                {/* <ToggleButton name='testToggleButton' onChange={c => console.log('ToggleButton active:', c)} /> */}
 
                 <MainContentBox>
                     <div css={css`box-sizing: border-box; display: flex; flex-direction: column; flex-basis: 66%; width: 100%; min-height: 0px; border-radius: 10px; gap: 10px;`}>
@@ -183,7 +182,7 @@ export default function Home() {
                             </Widget>
                             <Widget title='Light'>
                                 <div css={css`display: flex; align-items: center; justify-content: center; height: 100%;`}>
-                                    <ToggleButton name='testTogggleButton' />
+                                    <ToggleButton name='testToggleButton' />
                                 </div>
                             </Widget>
                             <Widget title='test3' />
@@ -191,8 +190,51 @@ export default function Home() {
                         </WidgetRow>
 
                         <WidgetRow>
-                            <Widget title='test5' />
-                            <Widget title='test6' addCssGetter={() => css`background: #00aeff91;`} />
+                            <Widget title='test5' custom>
+                                <div css={css`box-sizing: border-box; display: flex; padding: 10px; padding-top: 0px; flex: 1; width: 100%; max-width: 100%; min-height: 0px; align-items: flex-end;`}>
+                                    <div css={css`display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; height: 100%;`}>
+                                        <span css={css`display: flex; flex-direction: row; width: 100%; color: white;`}>Desk Lamp</span>
+                                        <InputLinearSlider sliderWidthPx={150} handleOverlayJsx={<div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}><MaterialIcon icon='lightbulb_2' wght={300} addCssGetter={() => css`font-size: 1rem; color: var(--primary-color);`} /></div>} />
+                                    </div>
+                                    
+                                    <div css={css`position: relative; top: 5px; width: 110px; height: 140px; overflow: hidden;`}>
+                                        <img
+                                            src='src/img/NONCOMMERCIAL_DeskLampRender_yganko_Vecteezy.png'
+                                            css={css`position: relative; top: 0px; left: -23px; width: 150px;`}
+                                        />
+                                    </div>
+                                </div>
+                            </Widget>
+                            <Widget
+                                title='test6'
+                                addCssGetter={() => css`background: #00aeff91; border-color: #70d2ffff; background: radial-gradient(#96bcde 60%, #5a96c6); background-size: 1000px 1000px; background-repeat: no-repeat;`}
+                                header={<>
+                                    {/* clear_day, cloud, foggy, partly_cloudy_day, partly_cloudy_night, rainy, sunny, thunderstorm */}
+
+                                    <div css={css`display: flex; flex-direction: column; color: white;`}>
+                                        <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
+                                            <MaterialIcon icon='partly_cloudy_day' wght={300} addCssGetter={() => css`font-size: 2.5rem; color: yellow;`} />
+                                            <span css={css`font-size: 1.5rem;`}>78°F</span>
+                                        </div>
+
+                                        <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
+                                            <span css={css``}>Partly Cloudy</span>
+                                            <span css={css``}>9MPH wind</span>
+                                        </div>
+                                    </div>
+                                </>}
+                            >
+                                <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-top: auto; width: 100%; font-weight: 200;`}>
+                                    {
+                                        ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((x, i) => (
+                                            <div css={css`display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; width: 2rem; border-radius: 5px; background: ${new Date().getDay() == i ? '#ffffff48' : 'transparent'};`}>
+                                                <span css={css`color: #ffffff8e;`}>{x}</span>
+                                                <span>{24 + i}</span>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            </Widget>
                         </WidgetRow>
                     </div>
 
@@ -210,9 +252,7 @@ export default function Home() {
                         </WidgetCol>
 
                         <Widget custom>
-                            {/* clear_day, cloud, foggy, partly_cloudy_day, partly_cloudy_night, rainy, sunny, thunderstorm */}
-                            
-                            <ImgBackground src={currentRoom?.img} css={css`top: 0px; left: -45px; width: unset; height: 100%; transform: scale(1.25)`} />
+                            <ImgBackground src={currentRoom?.img} css={css`top: 0px; left: -45px; width: unset; height: 100%; transform: scale(1.25);`} />
 
                             <div css={css`display: flex; gap: 5px;`}>
                                 <div css={css`display: flex; gap: 8px; align-items: center; justify-content: center; padding: 2px 10px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
@@ -244,7 +284,7 @@ export default function Home() {
                     
                     {
                         rooms.map(x => (
-                            <RoomSelectorBtn onClick={e => setRoomId(r => x.id)}>{x.name}</RoomSelectorBtn>
+                            <RoomSelectorBtn onClick={e => setRoomId(r => x.id)} $active={x.id == currentRoom?.id}>{x.name}</RoomSelectorBtn>
                         ))
                     }
                     

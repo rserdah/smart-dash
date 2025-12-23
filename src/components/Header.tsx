@@ -62,11 +62,18 @@ const NavButton = styled.button`
 
 const options = Object.keys(themes);
 
-export default function Header(props: HeaderProps) {
+export function ThemeSwitcher() {
     const { theme, setTheme } = useThemeContext();
+    
+    return (
+        <select css={css`margin: 10px; width: max-content; font-size: inherit;`} value={theme} onChange={e => setTheme(e.target.value as ThemeName)}>
+            {options.map(x => (<option value={x}>{x}</option>))}
+        </select>
+    )
+}
+export default function Header(props: HeaderProps) {
     const navigate = useNavigate();
     const location = useLocation();
-    
 
     return (
         <AppHeader>
@@ -86,9 +93,7 @@ export default function Header(props: HeaderProps) {
 
                 <span>Dashboard App</span>
 
-                <select css={css`margin: 10px; width: max-content; font-size: 20px;`} value={theme} onChange={e => setTheme(e.target.value as ThemeName)}>
-                    {options.map(x => (<option value={x}>{x}</option>))}
-                </select>
+                <ThemeSwitcher />
             </AppTitle>
         </AppHeader>
     )

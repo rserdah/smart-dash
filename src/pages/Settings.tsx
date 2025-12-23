@@ -6,7 +6,7 @@ import { css, useTheme } from '@emotion/react';
 import type { Theme } from '@/theme/types';
 import { baseTheme, themes, ThemeName } from '../theme/index';
 import { useThemeContext } from '../theme/themeContext';
-import Header from '../components/Header';
+import Header, { ThemeSwitcher } from '../components/Header';
 import InputKnob from '../components/input/InputKnob';
 import ToggleSwitch from '../components/input/ToggleSwitch';
 import Keyboard from '../components/input/Keyboard';
@@ -39,7 +39,7 @@ export default function Settings() {
     const modal = useModal();
 
     return (
-        <div css={css`box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; gap: 10px; padding: 25px 50px; width: 100%;`}>
+        <div css={css`box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; gap: 10px; padding: 25px 50px; width: 100%; color: var(--text-color)`}>
             <div css={css`box-sizing: border-box; display: flex; flex-direction: column; flex: 1; gap: 10px; width: 40%;`}>
                 <div css={css`display: flex; gap: 10px;`}>
                     <h3 css={css`flex: 1; margin: 0px;`}>Settings</h3>
@@ -58,6 +58,11 @@ export default function Settings() {
                 <div css={css`display: flex; gap: 10px;`}>
                     <span css={css`flex: 1`}>Enable for more options</span>
                     <ToggleSwitch name='testCheckbox' />
+                </div>
+
+                <div css={css`display: flex; align-items: center; gap: 10px;`}>
+                    <span css={css`flex: 1`}>Theme</span>
+                    <ThemeSwitcher />
                 </div>
 
                 <div css={css`display: flex; gap: 10px;`}>

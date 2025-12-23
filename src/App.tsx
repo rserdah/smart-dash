@@ -4,6 +4,7 @@ import { MemoryRouter, Routes, Route, NavLink } from 'react-router-dom';
 import styled from '@emotion/styled';
 import Header from './components/Header';
 import Home from './pages/Home';
+import AppsPage from './pages/AppsPage';
 import Settings from './pages/Settings';
 import Sidebar from './components/Sidebar';
 
@@ -18,7 +19,9 @@ const AppBox = styled.div`
     height: 100vh;
     font-weight: 500;
     /* background: radial-gradient(hsl(from var(--primary-color) h calc(s * 0.5) calc(l * 0.25)), var(--background-color)); */
-    /* background: var(--background-color); */
+    background: var(--background-color);
+    /* Allows the home screen background to be on top of the background color if present, but when the image is not present, the background color is correctly visible */
+    isolation: isolate;
     transition: background-color 0.25s ease;
 `;
 
@@ -41,6 +44,7 @@ export default function App(props: AppProps) {
 
                 <Routes>
                     <Route path='/' element={<Home />} />
+                    <Route path='/apps' element={<AppsPage />} />
                     <Route path='/settings' element={<Settings />} />
                 </Routes>
 

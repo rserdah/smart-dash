@@ -5,9 +5,10 @@ import { css } from '@emotion/react';
 import { useDrag } from '@/hooks/useDrag';
 
 interface InputLinearSliderProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    range?: [number, number], 
-    clampRange?: [number, number], 
-    sliderWidthPx?: number, 
+    range?: [number, number];
+    clampRange?: [number, number];
+    sliderWidthPx?: number;
+    handleOverlayJsx?: React.ReactNode;
 }
 
 interface Vector {
@@ -149,6 +150,7 @@ export default function InputLinearSlider(props: InputLinearSliderProps) {
                             ref={handleRef}
                             // onMouseDown={onMouseDown}
                         >
+                            {props.handleOverlayJsx}
                         </InputLinearSliderHandle>
                     </ProgressBar>
                 </GutterClip>
