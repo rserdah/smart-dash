@@ -4,6 +4,8 @@ import styled from '@emotion/styled';
 import { useDrag } from '@/hooks/useDrag';
 
 interface InputKnobProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    /** Should propagation of onPointerDown event on the container element be stopped? */
+    stopPointerDownPropagation?: boolean;
 }
 
 interface Vector {
@@ -106,6 +108,10 @@ export default function InputKnob(props: InputKnobProps) {
     const normalizeVector = (v: Vector) => scaleVector(v, 1 / magnitude(v));
 
     const onDragStart = (e: PointerEvent) => {
+        if(props.stopPointerDownPropagation) {
+            e.stopPropagation();
+        }
+
         // Prevent user from selecting text when dragging
         e.preventDefault();
 
@@ -146,6 +152,10 @@ export default function InputKnob(props: InputKnobProps) {
     };
 
     const onDrag = (e: PointerEvent, info: { dx: number; dy: number }) => {
+        if(props.stopPointerDownPropagation) {
+            e.stopPropagation();
+        }
+
         const newDragX = e.clientX;
         const newDragY = e.clientY;
         setDragX(newDragX);
@@ -153,9 +163,12 @@ export default function InputKnob(props: InputKnobProps) {
     };
 
     const onDragEnd = (e: PointerEvent) => {
+        if(props.stopPointerDownPropagation) {
+            e.stopPropagation();
+        }
     };
 
-    const drag = useDrag({ onDragStart, onDrag, onDragEnd });
+    const drag = useDrag({ onDragStart, onDrag, onDragEnd }, { stopPropagation: props.stopPointerDownPropagation });
 
     return (
         <InputKnobBox>

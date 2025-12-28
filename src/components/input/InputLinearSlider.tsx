@@ -9,6 +9,9 @@ interface InputLinearSliderProps extends React.InputHTMLAttributes<HTMLInputElem
     clampRange?: [number, number];
     sliderWidthPx?: number;
     handleOverlayJsx?: React.ReactNode;
+    
+    /** Should propagation of onPointerDown event on the container element be stopped? */
+    stopPointerDownPropagation?: boolean;
 }
 
 interface Vector {
@@ -142,7 +145,7 @@ export default function InputLinearSlider(props: InputLinearSliderProps) {
     const drag = useDrag({ onDragStart, onDrag, onDragEnd });
 
     return (
-        <InputLinearSliderBox $sliderWidthPx={props.sliderWidthPx ?? 100}>
+        <InputLinearSliderBox $sliderWidthPx={props.sliderWidthPx ?? 100} onPointerDown={props.stopPointerDownPropagation ? e => e.stopPropagation() : undefined}>
             <Gutter ref={gutterRef}>
                 <GutterClip {...drag}>
                     <ProgressBar $pixelWidth={styleValue}>

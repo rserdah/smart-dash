@@ -3,7 +3,7 @@ import React, { PropsWithChildren, useState } from 'react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
-type WidgetBaseProps = PropsWithChildren & {
+type ExpandedWidgetBaseProps = PropsWithChildren & {
     /** String title for the modal. Not used if header has a value. Ignored if custom is true. */
     title?: string;
 
@@ -13,87 +13,70 @@ type WidgetBaseProps = PropsWithChildren & {
     /** Function that returns styles to be added to the widget (on top of the base styles). */
     addCssGetter?: typeof css;
 
-    onClick?: React.MouseEventHandler<HTMLDivElement>;
-
-    onLongPress?: () => void;
-
-    longPressDelay?: number;
-
     /** Use child elements as fully custom JSX and don't provide the standard modal structure (e.g. ModalShell will not provide the header). If using this prop, should import and use the ModalHeader, ModalBody, ModalFooter, ModalFooterBtn for consistency of modal structure. */
     custom?: boolean;
 };
 
-type WidgetProps = Omit<any, keyof WidgetBaseProps> & WidgetBaseProps;
+type ExpandedWidgetProps = Omit<any, keyof ExpandedWidgetBaseProps> & ExpandedWidgetBaseProps;
 
-const WidgetBox = styled.div`
+const Box = styled.div`
     box-sizing: border-box;
     position: relative;
     display: flex;
     flex-direction: column;
     flex: 1;
-    gap: 10px;
-    padding: 10px;
-    width: 100%;
-    height: 100%;
-    min-height: 0px;
+    gap: 16px;
+    padding: 20px;
+    width: 40rem;
+    height: 25rem;
+    /* min-height: 0px; */
+    max-height: 90vh;
     border: 1px solid white;
+    /* border: 1px solid var(--input-border-color); */
     border-radius: 10px;
     /* background: var(--container-background-color); */
     background: #69696910;
+    color: var(--text-color);
     backdrop-filter: blur(10px) saturate(0.9);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
     overflow: hidden;
 `;
 
-const WidgetHeader = styled.div`
+const Header = styled.div`
     display: flex;
     flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     width: 100%;
+    font-size: 1.1rem;
+    font-weight: 600;
     color: white;
 `;
 
-const WidgetBody = styled.div`
+const Body = styled.div`
     display: flex;
     flex-direction: column;
     flex: 1;
     width: 100%;
     color: white;
+    /* overflow-y: auto; */
 `;
 
-export default function Widget({ title, header, custom, addCssGetter, onClick, onLongPress, longPressDelay, children }: WidgetProps) {
-    const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
-    
-    // TODO: Long press should be converted into a hook for reusability
-    const onPointerDown: React.PointerEventHandler<HTMLDivElement> = e => {
-        clearTimeout(timer!);
-
-        // Don't use callback setters or else if they run twice quickly (like in strict mode), the second timeout will not get cleared and the long press will get triggered even if it was just a single click
-        setTimer(setTimeout(() => {
-            onLongPress?.();
-
-            clearTimeout(timer!);
-            setTimer(null);
-        }, longPressDelay ?? 750));
-    };
-
-    const onPointerUp: React.PointerEventHandler<HTMLDivElement> = e => {
-        clearTimeout(timer!);
-        setTimer(null);
-    };
-
+export default function ExpandedWidget({ title, header, custom, addCssGetter, children }: ExpandedWidgetProps) {
     return (
-        <WidgetBox css={addCssGetter?.()} onClick={onClick} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
+        <Box css={addCssGetter?.()}>
             {
                 custom ? 
                     <>{children}</>
                     :
                     <>
-                        {(title || header) && (header ?? <WidgetHeader>{title}</WidgetHeader>)}
+                        {(title || header) && (header ?? <Header>{title}</Header>)}
 
-                        <WidgetBody>
+                        <Body>
                             {children}
-                        </WidgetBody>
+                        </Body>
                     </>
             }
-        </WidgetBox>
+        </Box>
     )
 }

@@ -13,7 +13,7 @@ const ModalOverlay = styled.div`
     align-items: center;
     justify-content: center;
 
-    background: rgba(0, 0, 0, 0.45);
+    background: #00000073;
     backdrop-filter: blur(6px);
 
     /* Prevent background scroll */

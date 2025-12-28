@@ -4,6 +4,8 @@ import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 
 interface InputTextProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    /** Should propagation of onPointerDown event on the container element be stopped? */
+    stopPointerDownPropagation?: boolean;
 }
 
 const InputTextBox = styled.div`
@@ -43,7 +45,7 @@ const InputText = forwardRef<HTMLInputElement, InputTextProps>((props: InputText
     }
 
     return (
-        <InputTextBox>
+        <InputTextBox onPointerDown={props.stopPointerDownPropagation ? e => e.stopPropagation() : undefined}>
             <InputTextInput {...props} ref={ref} type='text' value={value} onChange={onChange} />
         </InputTextBox>
     )

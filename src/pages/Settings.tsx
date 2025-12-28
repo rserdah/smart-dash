@@ -47,17 +47,17 @@ export default function Settings() {
 
                 <div css={css`display: flex; gap: 10px;`}>
                     <span css={css`flex: 1`}>Other setting</span>
-                    <ToggleSwitch name='testCheckbox' />
+                    <ToggleSwitch name='testCheckbox' stopPointerDownPropagation />
                 </div>
 
                 <div css={css`display: flex; gap: 10px;`}>
                     <span css={css`flex: 1`}>Another option for thing</span>
-                    <ToggleSwitch name='testCheckbox' />
+                    <ToggleSwitch name='testCheckbox' stopPointerDownPropagation />
                 </div>
 
                 <div css={css`display: flex; gap: 10px;`}>
                     <span css={css`flex: 1`}>Enable for more options</span>
-                    <ToggleSwitch name='testCheckbox' />
+                    <ToggleSwitch name='testCheckbox' stopPointerDownPropagation />
                 </div>
 
                 <div css={css`display: flex; align-items: center; gap: 10px;`}>

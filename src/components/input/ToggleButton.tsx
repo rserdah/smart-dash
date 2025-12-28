@@ -104,6 +104,7 @@ export default function ToggleButton(props: ToggleButtonProps) {
             icon={checked => <ButtonIcon className='material-symbols-outlined' $checked={checked}>power_settings_new</ButtonIcon>}
             checked={checked}
             onChange={onChange}
+            stopPointerDownPropagation
         />
     )
 }

@@ -13,6 +13,9 @@ import { useModal } from '@/modals/ModalContext';
 import { ModalProps, ModalBody, ModalFooter, ModalFooterBtn } from '@/modals/ModalShell';
 import { useEffect, useState } from 'react';
 import MaterialIcon from '@/components/MaterialIcon';
+import { LightWidget } from '@/widgets/light/LightWidget';
+import WidgetController from '@/widgets/WidgetController';
+import ExpandedWidget from '@/widgets/ExpandedWidget';
 
 // IMPORTANT! styled.element variables CANNOT be defined inside the functional component or else they will unmount every time the functional component re-renders
 const ImgBackground = styled.img`
@@ -64,26 +67,6 @@ const WidgetSlot = styled.div<{ $col: number, $colSpan: number, $row: number, $r
     grid-row: ${p => `${p.$row} / span ${p.$rowSpan}`};
 `;
 
-const WidgetRow = styled.div`
-    box-sizing: border-box;
-    display: flex;
-    gap: 10px;
-    flex: 1;
-    width: 100%;
-    min-height: 0px;
-    border-radius: 10px;
-`;
-
-const WidgetCol = styled.div`
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    flex: 1;
-    width: 100%;
-    min-height: 0px;
-`;
-
 const RoomSelectorBox = styled.div`
     display: flex;
     flex-direction: row;
@@ -115,21 +98,6 @@ const RoomSelectorBtn = styled.button<{ $active?: boolean }>`
         background: #ffffff2f;
     }
 `;
-
-/* export */ function ConfirmModal({ message, onConfirm, onClose }: ModalProps) {
-    return (
-        <>
-            <ModalBody>
-                <p>{message}</p>
-            </ModalBody>
-
-            <ModalFooter>
-                <ModalFooterBtn onClick={() => { onClose?.(); }}>Cancel</ModalFooterBtn>
-                <ModalFooterBtn onClick={async () => { const result = await onConfirm(); result && onClose?.(); }}>Confirm</ModalFooterBtn>
-            </ModalFooter>
-        </>
-    )
-}
 
 type RoomData = {
     id: string;
@@ -174,136 +142,264 @@ export default function Home() {
                 <MainContentBox>
                     <DashboardGrid>
                         <WidgetSlot $col={1} $row={1} $colSpan={8} $rowSpan={2}>
-                            <Widget
-                                addCssGetter={() => css`height: 100%;`}
-                                header={<div css={css`display: flex; flex-direction: row; justify-content: space-between; gap: 10px;`}>
-                                    <span css={css`color: white;`}>Toggle Modal</span>
-                                    <ToggleSwitch checked={checked} onToggle={checked => !Boolean(console.log(checked)) && modal.open(ConfirmModal, { title: 'Are you sure?', message: 'Are you sure you want to flip this switch?', onConfirm: () => { setChecked(c => !c); return true; } })} />
-                                </div>}
-                            >
-                            </Widget>
+                            <LightWidget grid={{col: 1, row: 1, colSpan: 1, rowSpan: 1}} />
                         </WidgetSlot>
 
                         <WidgetSlot $col={9} $row={1} $colSpan={2} $rowSpan={2}>
-                            <Widget addCssGetter={() => css`height: 100%;`} title='test7' />
+                            <WidgetController
+                                compactRender={props => <Widget addCssGetter={() => css`height: 100%;`} title='test7' onLongPress={() => props.setExpanded(true)} />}
+                                expandedRender={props => <ExpandedWidget title='test7' state={{}} actions={{}} />}
+                            />
                         </WidgetSlot>
 
                         <WidgetSlot $col={11} $row={1} $colSpan={2} $rowSpan={2}>
-                            <Widget addCssGetter={() => css`height: 100%;`} title='test8' />
+                            <WidgetController
+                                compactRender={props => <Widget addCssGetter={() => css`height: 100%;`} title='test8' onLongPress={() => props.setExpanded(true)} />}
+                                expandedRender={props => <ExpandedWidget title='test8' state={{}} actions={{}} />}
+                            />
                         </WidgetSlot>
 
-                        <WidgetSlot $col={1} $row={3} $colSpan={2} $rowSpan={2}>                            
-                            <Widget
-                                addCssGetter={() => css`height: 100%;`}
-                                header={<div css={css`display: flex; flex-direction: row; gap: 10px;`}>
-                                    <InputCheckbox name='testCheckbox' />
-                                    <span css={css`color: white;`}>Lighting</span>
-                                </div>}
-                            >
-                            </Widget>
+                        <WidgetSlot $col={1} $row={3} $colSpan={2} $rowSpan={2}>
+                            <WidgetController
+                                compactRender={props => (
+                                    <Widget
+                                        addCssGetter={() => css`height: 100%;`}
+                                        header={<div css={css`display: flex; flex-direction: row; gap: 10px;`}><InputCheckbox name='testCheckbox' stopPointerDownPropagation /><span css={css`color: white;`}>Lighting</span></div>}
+                                        onLongPress={() => props.setExpanded(true)}
+                                    >
+                                    </Widget>
+                                )}
+                                expandedRender={props => (
+                                    <ExpandedWidget title='test8' header={<div css={css`display: flex; flex-direction: row; gap: 10px;`}><InputCheckbox name='testCheckbox' stopPointerDownPropagation /><span css={css`color: white;`}>Lighting</span></div>} state={{}} actions={{}} >
+                                    </ExpandedWidget>
+                                )}
+                            />
                         </WidgetSlot>
 
                         <WidgetSlot $col={3} $row={3} $colSpan={2} $rowSpan={2}>
-                            <Widget title='Light' addCssGetter={() => css`height: 100%;`}>
-                                <div css={css`display: flex; align-items: center; justify-content: center; height: 100%;`}>
-                                    <ToggleButton name='testToggleButton' />
-                                </div>
-                            </Widget>
+                            <WidgetController
+                                compactRender={props => (
+                                    <Widget title='Light' addCssGetter={() => css`height: 100%;`} onLongPress={() => props.setExpanded(true)} >
+                                        <div css={css`display: flex; align-items: center; justify-content: center; height: 100%;`}>
+                                            <ToggleButton name='testToggleButton' />
+                                        </div>
+                                    </Widget>
+                                )}
+                                expandedRender={props => (
+                                    <ExpandedWidget title='Light' state={{}} actions={{}} >
+                                        <div css={css`display: flex; align-items: center; justify-content: center; height: 100%;`}>
+                                            <ToggleButton name='testToggleButton' />
+                                        </div>
+                                    </ExpandedWidget>
+                                )}
+                            />
                         </WidgetSlot>
 
                         <WidgetSlot $col={5} $row={3} $colSpan={2} $rowSpan={2}>
-                            <Widget title='test3' addCssGetter={() => css`height: 100%;`}>
-                                <div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}>
-                                    <InputKnob />
-                                </div>
-                            </Widget>
+                            <WidgetController
+                                compactRender={props => (
+                                    <Widget title='test3' addCssGetter={() => css`height: 100%;`} onLongPress={() => props.setExpanded(true)} >
+                                        <div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}>
+                                            <InputKnob stopPointerDownPropagation />
+                                        </div>
+                                    </Widget>
+                                )}
+                                expandedRender={props => (
+                                    <ExpandedWidget title='test3' state={{}} actions={{}} >
+                                        <div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}>
+                                            <InputKnob stopPointerDownPropagation />
+                                        </div>
+                                    </ExpandedWidget>
+                                )}
+                            />
                         </WidgetSlot>
 
                         <WidgetSlot $col={7} $row={3} $colSpan={2} $rowSpan={2}>
-                            <Widget title='test4' addCssGetter={() => css`height: 100%;`} />
+                            <WidgetController
+                                compactRender={props => <Widget title='test4' addCssGetter={() => css`height: 100%;`} onLongPress={() => props.setExpanded(true)} />}
+                                expandedRender={props => <ExpandedWidget title='test4' state={{}} actions={{}} />}
+                            />
                         </WidgetSlot>
 
                         <WidgetSlot $col={9} $row={3} $colSpan={4} $rowSpan={1}>
-                            <Widget title='new test' addCssGetter={() => css`height: 100%;`}>
-                                <InputText />
-                            </Widget>
+                            <WidgetController
+                                compactRender={props => (
+                                    <Widget title='new test' addCssGetter={() => css`height: 100%;`} onLongPress={() => props.setExpanded(true)} >
+                                        <InputText stopPointerDownPropagation />
+                                    </Widget>
+                                )}
+                                expandedRender={props => (
+                                    <ExpandedWidget title='new test' state={{}} actions={{}} >
+                                        <InputText stopPointerDownPropagation />
+                                    </ExpandedWidget>
+                                )}
+                            />
                         </WidgetSlot>
 
                         <WidgetSlot $col={1} $row={5} $colSpan={4} $rowSpan={2}>
-                            <Widget addCssGetter={() => css`height: 100%;`} custom>
-                                <div css={css`box-sizing: border-box; display: flex; padding: 10px; padding-top: 0px; flex: 1; width: 100%; max-width: 100%; min-height: 0px; align-items: flex-end;`}>
-                                    <div css={css`display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; height: 100%;`}>
-                                        <span css={css`display: flex; flex-direction: row; width: 100%; color: white;`}>Desk Lamp</span>
-                                        <InputLinearSlider sliderWidthPx={150} handleOverlayJsx={<div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}><MaterialIcon icon='lightbulb_2' wght={300} addCssGetter={() => css`font-size: 1rem; color: var(--primary-color);`} /></div>} />
-                                    </div>
-                                    
-                                    <div css={css`position: relative; top: 5px; width: 110px; height: 140px; overflow: hidden;`}>
-                                        <img
-                                            src='src/img/NONCOMMERCIAL_DeskLampRender_yganko_Vecteezy.png'
-                                            css={css`position: relative; top: 0px; left: -23px; width: 150px;`}
-                                        />
-                                    </div>
-                                </div>
-                            </Widget>
+                            <WidgetController
+                                compactRender={props => (
+                                    <Widget onLongPress={() => props.setExpanded(true)} custom>
+                                        <div css={css`box-sizing: border-box; display: flex; padding: 10px; padding-top: 0px; flex: 1; width: 100%; max-width: 100%; min-height: 0px; align-items: flex-end;`}>
+                                            <div css={css`display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; height: 100%;`}>
+                                                <span css={css`display: flex; flex-direction: row; width: 100%; color: white;`}>Desk Lamp</span>
+                                                <InputLinearSlider sliderWidthPx={150} handleOverlayJsx={<div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}><MaterialIcon icon='lightbulb_2' wght={300} addCssGetter={() => css`font-size: 1rem; color: var(--primary-color);`} /></div>} stopPointerDownPropagation />
+                                            </div>
+
+                                            <div css={css`position: relative; top: 5px; width: 110px; height: 140px; overflow: hidden;`}>
+                                                <img
+                                                    src='src/img/NONCOMMERCIAL_DeskLampRender_yganko_Vecteezy.png'
+                                                    css={css`position: relative; top: 0px; left: -23px; width: 150px;`}
+                                                />
+                                            </div>
+                                        </div>
+                                    </Widget>
+                                )}
+                                expandedRender={props => (
+                                    <ExpandedWidget title='new test' state={{}} actions={{}} custom>
+                                        <div css={css`box-sizing: border-box; display: flex; padding: 10px; padding-top: 0px; flex: 1; width: 100%; max-width: 100%; min-height: 0px; align-items: flex-end;`}>
+                                            <div css={css`display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; height: 100%;`}>
+                                                <span css={css`display: flex; flex-direction: row; width: 100%; color: white;`}>Desk Lamp</span>
+                                                <InputLinearSlider sliderWidthPx={150} handleOverlayJsx={<div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}><MaterialIcon icon='lightbulb_2' wght={300} addCssGetter={() => css`font-size: 1rem; color: var(--primary-color);`} /></div>} stopPointerDownPropagation />
+                                            </div>
+
+                                            <div css={css`position: relative; top: 5px; width: 110px; height: 140px; overflow: hidden;`}>
+                                                <img
+                                                    src='src/img/NONCOMMERCIAL_DeskLampRender_yganko_Vecteezy.png'
+                                                    css={css`position: relative; top: 0px; left: -23px; width: 150px;`}
+                                                />
+                                            </div>
+                                        </div>
+                                    </ExpandedWidget>
+                                )}
+                            />
                         </WidgetSlot>
 
                         <WidgetSlot $col={5} $row={5} $colSpan={4} $rowSpan={2}>
-                            <Widget
-                                title='test6'
-                                addCssGetter={() => css`height: 100%; background: #00aeff91; border-color: #70d2ffff; background: radial-gradient(#96bcde 60%, #5a96c6); background-size: 1000px 1000px; background-repeat: no-repeat;`}
-                                header={<>
-                                    <div css={css`display: flex; flex-direction: column; color: white;`}>
-                                        <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
-                                            <MaterialIcon icon='partly_cloudy_day' wght={300} addCssGetter={() => css`font-size: 2.5rem; color: yellow;`} />
-                                            <span css={css`font-size: 1.5rem;`}>78°F</span>
-                                        </div>
+                            <WidgetController
+                                compactRender={props => (
+                                    <Widget
 
-                                        <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
-                                            <span css={css``}>Partly Cloudy</span>
-                                            <span css={css``}>9MPH wind</span>
-                                        </div>
-                                    </div>
-                                </>}
-                            >
-                                <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-top: auto; width: 100%; font-weight: 200;`}>
-                                    {
-                                        ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((x, i) => (
-                                            <div css={css`display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; width: 2rem; border-radius: 5px; background: ${new Date().getDay() == i ? '#ffffff48' : 'transparent'};`}>
-                                                <span css={css`color: #ffffff8e;`}>{x}</span>
-                                                <span>{24 + i}</span>
+                                        header={<>
+                                            <div css={css`display: flex; flex-direction: column; color: white;`}>
+                                                <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
+                                                    <MaterialIcon icon='partly_cloudy_day' wght={300} addCssGetter={() => css`font-size: 2.5rem; color: yellow;`} />
+                                                    <span css={css`font-size: 1.5rem;`}>78°F</span>
+                                                </div>
+
+                                                <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
+                                                    <span css={css``}>Partly Cloudy</span>
+                                                    <span css={css``}>9MPH wind</span>
+                                                </div>
                                             </div>
-                                        ))
-                                    }
-                                </div>
-                            </Widget>
+                                        </>}
+                                        addCssGetter={() => css`height: 100%; background: #00aeff91; border-color: #70d2ffff; background: radial-gradient(#96bcde 60%, #5a96c6); background-size: 1000px 1000px; background-repeat: no-repeat;`}
+                                        onLongPress={() => props.setExpanded(true)}
+                                    >
+                                        <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-top: auto; width: 100%; font-weight: 200;`}>
+                                            {
+                                                ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((x, i) => (
+                                                    <div css={css`display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; width: 2rem; border-radius: 5px; background: ${new Date().getDay() == i ? '#ffffff48' : 'transparent'};`}>
+                                                        <span css={css`color: #ffffff8e;`}>{x}</span>
+                                                        <span>{24 + i}</span>
+                                                    </div>
+                                                ))
+                                            }
+                                        </div>
+                                    </Widget>
+                                )}
+                                expandedRender={props => (
+                                    <ExpandedWidget
+                                        title='new test'
+                                        header={<>
+                                            <div css={css`display: flex; flex-direction: column; color: white;`}>
+                                                <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
+                                                    <MaterialIcon icon='partly_cloudy_day' wght={300} addCssGetter={() => css`font-size: 2.5rem; color: yellow;`} />
+                                                    <span css={css`font-size: 1.5rem;`}>78°F</span>
+                                                </div>
+
+                                                <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
+                                                    <span css={css``}>Partly Cloudy</span>
+                                                    <span css={css``}>9MPH wind</span>
+                                                </div>
+                                            </div>
+                                        </>}
+                                        addCssGetter={() => css`background: #00aeff91; border-color: #70d2ffff; background: radial-gradient(#96bcde 60%, #5a96c6); background-size: 1000px 1000px; background-repeat: no-repeat;`}
+                                        state={{}}
+                                        actions={{}}
+                                    >
+                                        <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-top: auto; width: 100%; font-weight: 200;`}>
+                                            {
+                                                ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((x, i) => (
+                                                    <div css={css`display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; width: 2rem; border-radius: 5px; background: ${new Date().getDay() == i ? '#ffffff48' : 'transparent'};`}>
+                                                        <span css={css`color: #ffffff8e;`}>{x}</span>
+                                                        <span>{24 + i}</span>
+                                                    </div>
+                                                ))
+                                            }
+                                        </div>
+                                    </ExpandedWidget>
+                                )}
+                            />
                         </WidgetSlot>
 
                         <WidgetSlot $col={9} $row={4} $colSpan={4} $rowSpan={3}>
-                            <Widget addCssGetter={() => css`height: 100%;`} custom>
-                                <ImgBackground src={currentRoom?.img} css={css`top: 0px; left: -45px; width: unset; height: 100%; transform: scale(1.25);`} />
+                            <WidgetController
+                                compactRender={props => (
+                                    <Widget addCssGetter={() => css`height: 100%;`} onLongPress={() => props.setExpanded(true)} custom>
+                                        <ImgBackground src={currentRoom?.img} css={css`top: 0px; left: -45px; width: unset; height: 100%; transform: scale(1.25);`} />
 
-                                <div css={css`display: flex; gap: 5px;`}>
-                                    <div css={css`display: flex; gap: 8px; align-items: center; justify-content: center; padding: 2px 10px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
-                                        <div css={css`width: 5px; height: 5px; border-radius: 999px; background: #e92323ff; box-shadow: 0px 0px 4px 2px #e92323ff;`}></div>
-                                        <span css={css`font-size: 14px;`}>Live</span>
-                                    </div>
+                                        <div css={css`display: flex; gap: 5px;`}>
+                                            <div css={css`display: flex; gap: 8px; align-items: center; justify-content: center; padding: 2px 10px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                                <div css={css`width: 5px; height: 5px; border-radius: 999px; background: #e92323ff; box-shadow: 0px 0px 4px 2px #e92323ff;`}></div>
+                                                <span css={css`font-size: 14px;`}>Live</span>
+                                            </div>
 
-                                    <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
-                                        <MaterialIcon icon='bolt' addCssGetter={() => css`font-size: 20px;`} />
-                                        <span css={css`font-size: 14px;`}>65W</span>
-                                    </div>
+                                            <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                                <MaterialIcon icon='bolt' addCssGetter={() => css`font-size: 20px;`} />
+                                                <span css={css`font-size: 14px;`}>65W</span>
+                                            </div>
 
-                                    <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
-                                        <MaterialIcon icon='lightbulb_2' addCssGetter={() => css`font-size: 20px;`} />
-                                        <span css={css`font-size: 14px;`}>60%</span>
-                                    </div>
+                                            <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                                <MaterialIcon icon='lightbulb_2' addCssGetter={() => css`font-size: 20px;`} />
+                                                <span css={css`font-size: 14px;`}>60%</span>
+                                            </div>
 
-                                    <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
-                                        <MaterialIcon icon='thermometer' addCssGetter={() => css`font-size: 20px;`} />
-                                        <span css={css`font-size: 14px;`}>78°F</span>
-                                    </div>
-                                </div>
-                            </Widget>
+                                            <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                                <MaterialIcon icon='thermometer' addCssGetter={() => css`font-size: 20px;`} />
+                                                <span css={css`font-size: 14px;`}>78°F</span>
+                                            </div>
+                                        </div>
+                                    </Widget>
+                                )}
+                                expandedRender={props => (
+                                    <ExpandedWidget state={{}} actions={{}}>
+                                        <ImgBackground src={currentRoom?.img} css={css`top: 0px; left: -45px; width: unset; height: 100%; transform: scale(1.25);`} />
+
+                                        <div css={css`display: flex; gap: 5px;`}>
+                                            <div css={css`display: flex; gap: 8px; align-items: center; justify-content: center; padding: 2px 10px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                                <div css={css`width: 5px; height: 5px; border-radius: 999px; background: #e92323ff; box-shadow: 0px 0px 4px 2px #e92323ff;`}></div>
+                                                <span css={css`font-size: 14px;`}>Live</span>
+                                            </div>
+
+                                            <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                                <MaterialIcon icon='bolt' addCssGetter={() => css`font-size: 20px;`} />
+                                                <span css={css`font-size: 14px;`}>65W</span>
+                                            </div>
+
+                                            <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                                <MaterialIcon icon='lightbulb_2' addCssGetter={() => css`font-size: 20px;`} />
+                                                <span css={css`font-size: 14px;`}>60%</span>
+                                            </div>
+
+                                            <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                                <MaterialIcon icon='thermometer' addCssGetter={() => css`font-size: 20px;`} />
+                                                <span css={css`font-size: 14px;`}>78°F</span>
+                                            </div>
+                                        </div>
+                                    </ExpandedWidget>
+                                )}
+                            />
                         </WidgetSlot>
                     </DashboardGrid>
                 </MainContentBox>

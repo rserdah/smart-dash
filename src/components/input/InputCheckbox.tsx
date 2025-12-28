@@ -5,11 +5,14 @@ import { css, SerializedStyles } from '@emotion/react';
 import MaterialIcon from '../MaterialIcon';
 
 interface InputCheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, | 'type' | 'name' | 'checked' | 'onChange'> {
-    name: string, 
-    checked?: boolean, 
-    onChange?: (checked: boolean) => void, 
-    addContainerStyle?: string | SerializedStyles, 
-    icon?: ReactNode | ((checked: boolean) => ReactNode), 
+    name: string;
+    checked?: boolean;
+    onChange?: (checked: boolean) => void;
+    addContainerStyle?: string | SerializedStyles;
+    icon?: ReactNode | ((checked: boolean) => ReactNode);
+
+    /** Should propagation of onPointerDown event on the container element be stopped? */
+    stopPointerDownPropagation?: boolean;
 }
 
 const InputCheckboxBox = styled.div<{ $addContainerStyle?: string | SerializedStyles }>`
@@ -105,7 +108,7 @@ export default function InputCheckbox(props: InputCheckboxProps) {
     };
 
     return (
-        <InputCheckboxBox $addContainerStyle={props.addContainerStyle}>
+        <InputCheckboxBox $addContainerStyle={props.addContainerStyle} onPointerDown={props.stopPointerDownPropagation ? e => e.stopPropagation() : undefined}>
             {/* Since label is clickable and will trigger the onChange, the custom visual needs to be a child of label, but does not need any interactability */}
             <Checkbox
                 // htmlFor={props.name}

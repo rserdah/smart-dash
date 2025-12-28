@@ -1,16 +1,25 @@
-// From ChatGPT
+// Modified from ChatGPT
 import { useRef, useCallback } from 'react';
 
-export type DragCallbacks = {
+type DragCallbacks = {
     onDragStart?: (event: PointerEvent) => void;
     onDrag?: (event: PointerEvent, info: { dx: number; dy: number }) => void;
     onDragEnd?: (event: PointerEvent) => void;
 };
 
-export function useDrag({ onDragStart, onDrag, onDragEnd }: DragCallbacks) {
+type UseDragOptions = {
+    /** Should propagation of events on this element be stopped? */
+    stopPropagation?: boolean;
+};
+
+export function useDrag({ onDragStart, onDrag, onDragEnd }: DragCallbacks, options?: UseDragOptions) {
     const last = useRef<{ x: number; y: number } | null>(null);
 
     const onPointerDown = useCallback((e: React.PointerEvent) => {
+        if(options?.stopPropagation) {
+            e.stopPropagation();
+        }
+
         e.preventDefault();
         (e.target as HTMLElement).setPointerCapture(e.pointerId);
 
@@ -21,6 +30,10 @@ export function useDrag({ onDragStart, onDrag, onDragEnd }: DragCallbacks) {
         onDragStart?.(e.nativeEvent);
 
         const handleMove = (ev: PointerEvent) => {
+            if(options?.stopPropagation) {
+                ev.stopPropagation();
+            }
+
             if (!last.current) return;
 
             const dx = ev.clientX - last.current.x;
@@ -32,6 +45,10 @@ export function useDrag({ onDragStart, onDrag, onDragEnd }: DragCallbacks) {
         };
 
         const handleUp = (ev: PointerEvent) => {
+            if(options?.stopPropagation) {
+                ev.stopPropagation();
+            }
+
             last.current = null;
 
             window.removeEventListener('pointermove', handleMove);

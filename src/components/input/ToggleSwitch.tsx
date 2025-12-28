@@ -5,7 +5,10 @@ import { css } from '@emotion/react';
 
 interface ToggleSwitchProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onToggle'> {
     // Omit the props not used or ones that should be overridden
-    onToggle?: (checked: boolean) => void, 
+    onToggle?: (checked: boolean) => void;
+
+    /** Should propagation of onPointerDown event on the container element be stopped? */
+    stopPointerDownPropagation?: boolean;
 }
 
 const ToggleSwitchBox = styled.div`
@@ -81,7 +84,7 @@ export default function ToggleSwitch(props: ToggleSwitchProps) {
     }
 
     return (
-        <ToggleSwitchBox onClick={e => onToggle(!checked)}>
+        <ToggleSwitchBox onClick={e => onToggle(!checked)} onPointerDown={props.stopPointerDownPropagation ? e => e.stopPropagation() : undefined}>
             <Gutter $value={checked}>
                 <Handle $value={checked} />
             </Gutter>
