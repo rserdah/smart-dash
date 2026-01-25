@@ -1,9 +1,16 @@
 /** @jsxImportSource @emotion/react */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, ReactNode } from 'react';
 import styled from '@emotion/styled';
 import { useDrag } from '@/hooks/useDrag';
+import { css, SerializedStyles } from '@emotion/react';
 
-interface InputKnobProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputKnobProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, | 'type' | 'name' | 'value' | 'defaultValue' | 'onChange'> {
+    name: string;
+    value?: number;
+    defaultValue?: number;
+    onChange?: (value: number) => void;
+    addContainerStyle?: string | SerializedStyles;
+
     /** Should propagation of onPointerDown event on the container element be stopped? */
     stopPointerDownPropagation?: boolean;
 }
@@ -44,70 +51,37 @@ const InputKnobIndicator = styled.div`
     background: gray;
 `;
 
+// Modified from ChatGPT
+function normalizeDelta(delta: number) {
+    if (delta > Math.PI) return delta - Math.PI * 2;
+    if (delta < -Math.PI) return delta + Math.PI * 2;
+    return delta;
+}
+
+// Modified from ChatGPT
+function getAngle(cx: number, cy: number, x: number, y: number) {
+    return Math.atan2(y - cy, x - cx);
+}
+
 export default function InputKnob(props: InputKnobProps) {
-    const [value, setValue] = useState<number>(0);
-    const [rotOffset, setRotOffset] = useState<number>(0);
-    const [rot, setRot] = useState<number>(0);
-    const [centerX, setCenterX] = useState<number>(0);
-    const [centerY, setCenterY] = useState<number>(0);
-    const [dragX, setDragX] = useState<number>(0);
-    const [dragY, setDragY] = useState<number>(0);
+    const controlled = props.value != undefined;
+    // Internal value and state setter (only used if not controlled)
+    const [_value, _setValue] = React.useState(props.defaultValue ?? 0);
+    const value = controlled ? props.value! : _value;
+
+    const startAngleRef = useRef(0);
+    const startValueRef = useRef(0);
 
     const handleRef = useRef<HTMLDivElement | null>(null);
 
-    useEffect(() => {
-        const elem: HTMLElement | null = document.querySelector('#posTest2');
-        elem!.style.left = dragX + 'px';
-        elem!.style.top = dragY + 'px';
+    const onChange = (value: typeof _value) => {
+        if (!controlled) _setValue(value);
 
-        const normalizeElem: HTMLElement | null = document.querySelector('#posTest3');
+        props.onChange?.(value);
+    };
 
-        // Gets vector from center of knob to cursor (don't change this to be relative to current rot)
-        const dragVect = addVector(scaleVector(normalizeVector(addVector(vector(dragX, dragY), vector(-centerX, -centerY))), 60), vector(centerX, centerY));
-
-        normalizeElem!.style.left = dragVect.x + 'px';
-        normalizeElem!.style.top = dragVect.y + 'px';
-
-        const x = dragVect.x - centerX;
-        const y = dragVect.y - (centerY - 60);
-
-        const angle = Math.abs((Math.atan2(x, y) * 180 / Math.PI) - 180);
-
-        console.log('angle', angle);
-        // console.log('startRot', startRot);
-
-        const newRot = rotOffset + angle;
-
-        !Number.isNaN(newRot) && setRot(newRot);
-    }, [dragX, dragY]);
-
-    useEffect(() => {
-        const elem: HTMLElement | null = document.querySelector('#posTest');
-        elem!.style.left = centerX + 'px';
-        elem!.style.top = centerY + 'px';
-
-        const elem4: HTMLElement | null = document.querySelector('#posTest4');
-        elem4!.style.left = centerX + 'px';
-        elem4!.style.top = (centerY - 60) + 'px';
-    }, [centerX, centerY]);
-
-    const vector = (x: number, y: number) => ({ x, y });
-
-    const magnitude = (v: Vector) => Math.sqrt(v.x ** 2 + v.y ** 2);
-
-    const addVector = (v1: Vector, v2: Vector) => vector(
-        v1.x + v2.x,
-        v1.y + v2.y,
-    );
-
-    const scaleVector = (v: Vector, scale: number) => vector(
-        v.x * scale,
-        v.y * scale,
-    );
-
-    const normalizeVector = (v: Vector) => scaleVector(v, 1 / magnitude(v));
-
-    const onDragStart = (e: PointerEvent) => {
+    // Modified from ChatGPT
+    const onDragStart = useCallback((e: PointerEvent) => {
         if(props.stopPointerDownPropagation) {
             e.stopPropagation();
         }
@@ -115,58 +89,41 @@ export default function InputKnob(props: InputKnobProps) {
         // Prevent user from selecting text when dragging
         e.preventDefault();
 
-        const rect: DOMRect | undefined = handleRef!.current?.getBoundingClientRect();
-        const newCenterX = rect!.x + rect!.width / 2;
-        const newCenterY = rect!.y + rect!.height / 2;
+        const rect = handleRef.current!.getBoundingClientRect();
 
-        const startDragX = e.clientX;
-        const startDragY = e.clientY;
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
 
-        console.log('(e.clientX, e.clientY)', e.clientX, e.clientY);
+        startAngleRef.current = getAngle(cx, cy, e.clientX, e.clientY);
+        startValueRef.current = value;
+    }, [value]);
 
-        // Gets vector from center of knob to cursor (don't change this to be relative to current rot)
-        const dragVect = addVector(scaleVector(normalizeVector(addVector(vector(startDragX, startDragY), vector(-newCenterX, -newCenterY))), 60), vector(newCenterX, newCenterY));
-
-        // console.log('rot', rot);
-
-        const currX = Math.cos((rot) * Math.PI / 180) * 60;
-        const currY = Math.sin((rot) * Math.PI / 180) * 60;
-
-        const currVect = addVector(scaleVector(normalizeVector(vector(currX, currY)), 60), vector(newCenterX, newCenterY));
-
-        const elem5: HTMLElement | null = document.querySelector('#posTest5');
-        elem5!.style.left = currVect.x + 'px';
-        elem5!.style.top = currVect.y + 'px';
-
-        const x = dragVect.x - currVect.x;
-        const y = dragVect.y - currVect.y;
-
-        const angle = Math.atan2(x, y) * 180 / Math.PI;
-        // console.log('angle', angle);
-
-        // console.log('angle - rot', angle - rot);
-
-        setCenterX(newCenterX);
-        setCenterY(newCenterY);
-        setRotOffset(angle);
-    };
-
-    const onDrag = (e: PointerEvent, info: { dx: number; dy: number }) => {
+    // Modified from ChatGPT
+    const onDrag = useCallback((e: PointerEvent, info: { dx: number; dy: number }) => {
         if(props.stopPointerDownPropagation) {
             e.stopPropagation();
         }
 
-        const newDragX = e.clientX;
-        const newDragY = e.clientY;
-        setDragX(newDragX);
-        setDragY(newDragY);
-    };
+        const rect = handleRef.current!.getBoundingClientRect();
 
-    const onDragEnd = (e: PointerEvent) => {
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+
+        const currentAngle = getAngle(cx, cy, e.clientX, e.clientY);
+        let delta = currentAngle - startAngleRef.current;
+        delta = normalizeDelta(delta);
+
+        const degrees = delta * (180 / Math.PI);
+
+        onChange(startValueRef.current + degrees);
+    }, []);
+
+    // Modified from ChatGPT
+    const onDragEnd = useCallback((e: PointerEvent) => {
         if(props.stopPointerDownPropagation) {
             e.stopPropagation();
         }
-    };
+    }, []);
 
     const drag = useDrag({ onDragStart, onDrag, onDragEnd }, { stopPropagation: props.stopPointerDownPropagation });
 
@@ -174,9 +131,7 @@ export default function InputKnob(props: InputKnobProps) {
         <InputKnobBox>
             <InputKnobHandle
                 ref={handleRef}
-                className='input-knob__handle'
-                style={{ transform: `rotate(${rot}deg)` }}
-                // onMouseDown={onMouseDown}
+                style={{ transform: `rotate(${value}deg)` }}
                 {...drag}
             >
                 <InputKnobIndicator />
