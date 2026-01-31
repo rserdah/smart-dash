@@ -8,16 +8,14 @@ interface InputKnobProps extends Omit<React.InputHTMLAttributes<HTMLInputElement
     name: string;
     value?: number;
     defaultValue?: number;
+    min?: number;
+    max?: number;
+    step?: number;
     onChange?: (value: number) => void;
     addContainerStyle?: string | SerializedStyles;
 
     /** Should propagation of onPointerDown event on the container element be stopped? */
     stopPointerDownPropagation?: boolean;
-}
-
-interface Vector {
-    x: number, 
-    y: number, 
 }
 
 const InputKnobBox = styled.div`
@@ -53,14 +51,25 @@ const InputKnobIndicator = styled.div`
 
 // Modified from ChatGPT
 function normalizeDelta(delta: number) {
-    if (delta > Math.PI) return delta - Math.PI * 2;
-    if (delta < -Math.PI) return delta + Math.PI * 2;
+    if(delta > Math.PI) return delta - Math.PI * 2;
+    if(delta < -Math.PI) return delta + Math.PI * 2;
     return delta;
 }
 
 // Modified from ChatGPT
 function getAngle(cx: number, cy: number, x: number, y: number) {
     return Math.atan2(y - cy, x - cx);
+}
+
+// Modified from ChatGPT
+function clamp(v: number, min: number, max: number) {
+    return Math.min(max, Math.max(min, v));
+}
+
+// Modified from ChatGPT
+function snap(v: number, step?: number) {
+    if(!step) return v;
+    return Math.round(v / step) * step;
 }
 
 export default function InputKnob(props: InputKnobProps) {
@@ -75,7 +84,7 @@ export default function InputKnob(props: InputKnobProps) {
     const handleRef = useRef<HTMLDivElement | null>(null);
 
     const onChange = (value: typeof _value) => {
-        if (!controlled) _setValue(value);
+        if(!controlled) _setValue(value);
 
         props.onChange?.(value);
     };
@@ -113,10 +122,14 @@ export default function InputKnob(props: InputKnobProps) {
         let delta = currentAngle - startAngleRef.current;
         delta = normalizeDelta(delta);
 
-        const degrees = delta * (180 / Math.PI);
+        let degrees = delta * (180 / Math.PI);
 
-        onChange(startValueRef.current + degrees);
-    }, []);
+        degrees = startValueRef.current + degrees;
+        
+        degrees = snap(clamp(degrees, -90, 90), props.step);
+
+        onChange(degrees);
+    }, [_value]); // ?????
 
     // Modified from ChatGPT
     const onDragEnd = useCallback((e: PointerEvent) => {
