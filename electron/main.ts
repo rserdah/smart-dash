@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 // __dirname is the folder this file is in
 const __dirname = path.dirname(__filename);
 
-const useSemiKiosk = true;
+const useSemiKiosk = false;
 
 function createWindow() {
     const win = new BrowserWindow({

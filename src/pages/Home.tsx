@@ -14,6 +14,7 @@ import { ModalProps, ModalBody, ModalFooter, ModalFooterBtn } from '@/modals/Mod
 import { useEffect, useState } from 'react';
 import MaterialIcon from '@/components/MaterialIcon';
 import { LightWidget } from '@/widgets/light/LightWidget';
+import { WeatherWidget } from '@/widgets/weather/WeatherWidget';
 import WidgetController from '@/widgets/WidgetController';
 import ExpandedWidget from '@/widgets/ExpandedWidget';
 
@@ -200,14 +201,14 @@ export default function Home() {
                                 compactRender={props => (
                                     <Widget title='test3' addCssGetter={() => css`height: 100%;`} onLongPress={() => props.setExpanded(true)} >
                                         <div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}>
-                                            <InputKnob stopPointerDownPropagation />
+                                            <InputKnob name='' stopPointerDownPropagation />
                                         </div>
                                     </Widget>
                                 )}
                                 expandedRender={props => (
                                     <ExpandedWidget title='test3' state={{}} actions={{}} >
                                         <div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}>
-                                            <InputKnob stopPointerDownPropagation />
+                                            <InputKnob name='' stopPointerDownPropagation />
                                         </div>
                                     </ExpandedWidget>
                                 )}
@@ -243,7 +244,7 @@ export default function Home() {
                                         <div css={css`box-sizing: border-box; display: flex; padding: 10px; padding-top: 0px; flex: 1; width: 100%; max-width: 100%; min-height: 0px; align-items: flex-end;`}>
                                             <div css={css`display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; height: 100%;`}>
                                                 <span css={css`display: flex; flex-direction: row; width: 100%; color: white;`}>Desk Lamp</span>
-                                                <InputLinearSlider sliderWidthPx={150} handleOverlayJsx={<div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}><MaterialIcon icon='lightbulb_2' wght={300} addCssGetter={() => css`font-size: 1rem; color: var(--primary-color);`} /></div>} stopPointerDownPropagation />
+                                                <InputLinearSlider name='' sliderWidthPx={150} handleOverlayJsx={<div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}><MaterialIcon icon='lightbulb_2' wght={300} addCssGetter={() => css`font-size: 1rem; color: var(--primary-color);`} /></div>} stopPointerDownPropagation />
                                             </div>
 
                                             <div css={css`position: relative; top: 5px; width: 110px; height: 140px; overflow: hidden;`}>
@@ -260,7 +261,7 @@ export default function Home() {
                                         <div css={css`box-sizing: border-box; display: flex; padding: 10px; padding-top: 0px; flex: 1; width: 100%; max-width: 100%; min-height: 0px; align-items: flex-end;`}>
                                             <div css={css`display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; height: 100%;`}>
                                                 <span css={css`display: flex; flex-direction: row; width: 100%; color: white;`}>Desk Lamp</span>
-                                                <InputLinearSlider sliderWidthPx={150} handleOverlayJsx={<div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}><MaterialIcon icon='lightbulb_2' wght={300} addCssGetter={() => css`font-size: 1rem; color: var(--primary-color);`} /></div>} stopPointerDownPropagation />
+                                                <InputLinearSlider name='' sliderWidthPx={150} handleOverlayJsx={<div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}><MaterialIcon icon='lightbulb_2' wght={300} addCssGetter={() => css`font-size: 1rem; color: var(--primary-color);`} /></div>} stopPointerDownPropagation />
                                             </div>
 
                                             <div css={css`position: relative; top: 5px; width: 110px; height: 140px; overflow: hidden;`}>
@@ -276,71 +277,7 @@ export default function Home() {
                         </WidgetSlot>
 
                         <WidgetSlot $col={5} $row={5} $colSpan={4} $rowSpan={2}>
-                            <WidgetController
-                                compactRender={props => (
-                                    <Widget
-
-                                        header={<>
-                                            <div css={css`display: flex; flex-direction: column; color: white;`}>
-                                                <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
-                                                    <MaterialIcon icon='partly_cloudy_day' wght={300} addCssGetter={() => css`font-size: 2.5rem; color: yellow;`} />
-                                                    <span css={css`font-size: 1.5rem;`}>78°F</span>
-                                                </div>
-
-                                                <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
-                                                    <span css={css``}>Partly Cloudy</span>
-                                                    <span css={css``}>9MPH wind</span>
-                                                </div>
-                                            </div>
-                                        </>}
-                                        addCssGetter={() => css`height: 100%; background: #00aeff91; border-color: #70d2ffff; background: radial-gradient(#96bcde 60%, #5a96c6); background-size: 1000px 1000px; background-repeat: no-repeat;`}
-                                        onLongPress={() => props.setExpanded(true)}
-                                    >
-                                        <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-top: auto; width: 100%; font-weight: 200;`}>
-                                            {
-                                                ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((x, i) => (
-                                                    <div css={css`display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; width: 2rem; border-radius: 5px; background: ${new Date().getDay() == i ? '#ffffff48' : 'transparent'};`}>
-                                                        <span css={css`color: #ffffff8e;`}>{x}</span>
-                                                        <span>{24 + i}</span>
-                                                    </div>
-                                                ))
-                                            }
-                                        </div>
-                                    </Widget>
-                                )}
-                                expandedRender={props => (
-                                    <ExpandedWidget
-                                        title='new test'
-                                        header={<>
-                                            <div css={css`display: flex; flex-direction: column; color: white;`}>
-                                                <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
-                                                    <MaterialIcon icon='partly_cloudy_day' wght={300} addCssGetter={() => css`font-size: 2.5rem; color: yellow;`} />
-                                                    <span css={css`font-size: 1.5rem;`}>78°F</span>
-                                                </div>
-
-                                                <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
-                                                    <span css={css``}>Partly Cloudy</span>
-                                                    <span css={css``}>9MPH wind</span>
-                                                </div>
-                                            </div>
-                                        </>}
-                                        addCssGetter={() => css`background: #00aeff91; border-color: #70d2ffff; background: radial-gradient(#96bcde 60%, #5a96c6); background-size: 1000px 1000px; background-repeat: no-repeat;`}
-                                        state={{}}
-                                        actions={{}}
-                                    >
-                                        <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-top: auto; width: 100%; font-weight: 200;`}>
-                                            {
-                                                ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((x, i) => (
-                                                    <div css={css`display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; width: 2rem; border-radius: 5px; background: ${new Date().getDay() == i ? '#ffffff48' : 'transparent'};`}>
-                                                        <span css={css`color: #ffffff8e;`}>{x}</span>
-                                                        <span>{24 + i}</span>
-                                                    </div>
-                                                ))
-                                            }
-                                        </div>
-                                    </ExpandedWidget>
-                                )}
-                            />
+                            <WeatherWidget grid={{col: 1, row: 1, colSpan: 1, rowSpan: 1}} />
                         </WidgetSlot>
 
                         <WidgetSlot $col={9} $row={4} $colSpan={4} $rowSpan={3}>
