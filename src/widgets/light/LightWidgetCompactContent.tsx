@@ -40,7 +40,7 @@ export default function LightWidgetCompact({ state, actions, setExpanded }: Prop
             addCssGetter={() => css`height: 100%;`}
             header={<div css={css`display: flex; flex-direction: row; justify-content: space-between; gap: 10px;`}>
                 <span css={css`color: white;`}>Toggle Modal</span>
-                <ToggleSwitch checked={checked} onToggle={checked => !Boolean(console.log(checked)) && modal.open(ConfirmModal, { title: 'Are you sure?', message: 'Are you sure you want to flip this switch?', onConfirm: () => { setChecked(c => !c); return true; } })} stopPointerDownPropagation />
+                <ToggleSwitch checked={state.isSwitchOn} onToggle={actions.toggleSwitch /* checked => !Boolean(console.log(checked)) && modal.open(ConfirmModal, { title: 'Are you sure?', message: 'Are you sure you want to flip this switch?', onConfirm: () => { setChecked(c => !c); return true; } }) */} stopPointerDownPropagation />
             </div>}
             onLongPress={() => setExpanded(true)}
         >

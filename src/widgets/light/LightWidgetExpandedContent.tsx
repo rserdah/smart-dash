@@ -20,7 +20,7 @@ export default function LightWidgetExpanded({ state, actions, setExpanded }: Pro
             title='Living Room Light'
             header={<div css={css`display: flex; flex-direction: row; justify-content: space-between; gap: 10px;`}>
                 <span css={css`color: white;`}>Toggle Modal</span>
-                <ToggleSwitch /* checked={checked} onToggle={checked => !Boolean(console.log(checked)) && modal.open(ConfirmModal, { title: 'Are you sure?', message: 'Are you sure you want to flip this switch?', onConfirm: () => { setChecked(c => !c); return true; } })} */ stopPointerDownPropagation />
+                <ToggleSwitch checked={state.isSwitchOn} onToggle={actions.toggleSwitch /* checked => !Boolean(console.log(checked)) && modal.open(ConfirmModal, { title: 'Are you sure?', message: 'Are you sure you want to flip this switch?', onConfirm: () => { setChecked(c => !c); return true; } }) */} stopPointerDownPropagation />
             </div>}
         >
             {/* TODO: Widget content that should be reused should be made into components and used for the compact content and the expanded content */}
@@ -31,8 +31,8 @@ export default function LightWidgetExpanded({ state, actions, setExpanded }: Pro
             />
 
             <InputLinearSlider
-                value={state.brightness}
-            // onChange={actions.setBrightness}
+                // value={state.brightness}
+                // onChange={actions.setBrightness}
             />
         </ExpandedWidget>
     )
