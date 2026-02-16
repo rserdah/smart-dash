@@ -4,6 +4,7 @@ import WidgetPortal from '@/layout/WidgetPortal';
 
 type WidgetContentProps = {
     setExpanded: (expanded: boolean) => void;
+    expanded: boolean;
 }
 
 type Props = {
@@ -19,11 +20,11 @@ export default function WidgetController({ compactRender, expandedRender }: Prop
             {
                 !expandedOpen ?
                     <>
-                        {compactRender({ setExpanded: setExpandedOpen })}
+                        {compactRender({ setExpanded: setExpandedOpen, expanded: expandedOpen })}
                     </>
                     :
                     <WidgetPortal expanded={expandedOpen} onClose={() => setExpandedOpen(false)}>
-                        {expandedRender({ setExpanded: setExpandedOpen })}
+                        {expandedRender({ setExpanded: setExpandedOpen, expanded: expandedOpen })}
                     </WidgetPortal>
             }
         </>
