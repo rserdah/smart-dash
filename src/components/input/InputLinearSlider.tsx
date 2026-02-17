@@ -1,12 +1,19 @@
 /** @jsxImportSource @emotion/react */
 import React, { useState, useRef, useEffect } from 'react';
 import styled from '@emotion/styled';
-import { css } from '@emotion/react';
+import { css, SerializedStyles } from '@emotion/react';
 import { useDrag } from '@/hooks/useDrag';
 
-interface InputLinearSliderProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputLinearSliderProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, | 'type' | 'name' | 'value' | 'defaultValue' | 'onChange'> {
+    name: string;
+    value?: number;
+    defaultValue?: number;
+    step?: number;
     range?: [number, number];
     clampRange?: [number, number];
+    onChange?: (value: number) => void;
+    addContainerStyle?: string | SerializedStyles;
+
     sliderWidthPx?: number;
     handleOverlayJsx?: React.ReactNode;
     
@@ -14,19 +21,8 @@ interface InputLinearSliderProps extends React.InputHTMLAttributes<HTMLInputElem
     stopPointerDownPropagation?: boolean;
 }
 
-interface Vector {
-    x: number, 
-    y: number, 
-}
-
 // Modified from ChatGPT
-function mapRange(
-    value: number,
-    inMin: number,
-    inMax: number,
-    outMin: number = 0,
-    outMax: number = 1
-) {
+function mapRange(value: number, inMin: number, inMax: number, outMin: number = 0, outMax: number = 1) {
     // Normalize first (makes it from 0 to 1)
     const normalized = (value - inMin) / (inMax - inMin);
 
@@ -92,22 +88,32 @@ const InputLinearSliderHandle = styled.div`
 `;
 
 export default function InputLinearSlider(props: InputLinearSliderProps) {
-    const [value, setValue] = useState<number>(0);
-    const [styleValue, setStyleValue] = useState<number>(0);
+    const controlled = props.value != undefined;
+    // Internal value and state setter (only used if not controlled)
+    const [_value, _setValue] = React.useState(props.defaultValue ?? 50);
+    const value = controlled ? props.value! : _value;
+
+    const [styleValue, setStyleValue] = useState<number>(value);
 
     const gutterRef = useRef<HTMLDivElement | null>(null);
     const handleRef = useRef<HTMLDivElement | null>(null);
 
+    const onChange = (value: typeof _value) => {
+        if(!controlled) { _setValue(value); console.log(value); };
+
+        props.onChange?.(value);
+    };
+
     // The actual input value is going to be based on the style/visual value because the visual range of the slider has restrictions (the handle can't go further down than the width of it or else it will go off of the slider gutter)
-    useEffect(() => {
-        let newValue = 0;
-        const visualMinPx = (sliderHeightPx + progressBarPadPx + progressBarPadPx);
-        const visualMaxPx = props.sliderWidthPx ?? 100;
+    // useEffect(() => {
+    //     let newValue = 0;
+    //     const visualMinPx = (sliderHeightPx + progressBarPadPx + progressBarPadPx);
+    //     const visualMaxPx = props.sliderWidthPx ?? 100;
 
-        newValue = mapRange(styleValue, visualMinPx, visualMaxPx, 0, 100);
+    //     newValue = mapRange(styleValue, visualMinPx, visualMaxPx, 0, 100);
 
-        setValue(newValue);
-    }, [styleValue]);
+    //     onChange(newValue);
+    // }, [styleValue]);
 
     const onDragStart = (e: PointerEvent) => {
         // // Prevent user from selecting text when dragging
@@ -122,21 +128,23 @@ export default function InputLinearSlider(props: InputLinearSliderProps) {
     };
 
     const onDrag = (e: PointerEvent, info: { dx: number; dy: number }) => {
-        setStyleValue(v => {
-            let newStyleValue = v + info.dx;
+        onChange(value + info.dx);
 
-            // Clamp the value to the visual minimum of the slider (visual miniumum meaning the lowest that the slider handle can go; which will effectively subtract from the full range of values (i.e. if the slider handle is 32px circle, then the new range would be from 32px to <the slider width>))
-            // Pixel values are used because percents will cause it to misalign with the user's drag
-            const visualMinPx = (sliderHeightPx + progressBarPadPx + progressBarPadPx);
-            const visualMaxPx = props.sliderWidthPx ?? 100;
+        // setStyleValue(v => {
+        //     let newStyleValue = v + info.dx;
+
+        //     // Clamp the value to the visual minimum of the slider (visual miniumum meaning the lowest that the slider handle can go; which will effectively subtract from the full range of values (i.e. if the slider handle is 32px circle, then the new range would be from 32px to <the slider width>))
+        //     // Pixel values are used because percents will cause it to misalign with the user's drag
+        //     const visualMinPx = (sliderHeightPx + progressBarPadPx + progressBarPadPx);
+        //     const visualMaxPx = props.sliderWidthPx ?? 100;
             
-            newStyleValue = Math.min(Math.max(newStyleValue, visualMinPx), visualMaxPx);
+        //     newStyleValue = Math.min(Math.max(newStyleValue, visualMinPx), visualMaxPx);
 
-            // Since the visual range of the slider has restrictions (the handle can't go further down than the width of it or else it will go off of the slider gutter), the actual value is going to be based on the style/visual value
-            // The actual input value will be set using a useEffect based on the style value
+        //     // Since the visual range of the slider has restrictions (the handle can't go further down than the width of it or else it will go off of the slider gutter), the actual value is going to be based on the style/visual value
+        //     // The actual input value will be set using a useEffect based on the style value
 
-            return newStyleValue;
-        });
+        //     return newStyleValue;
+        // });
     };
 
     const onDragEnd = (e: PointerEvent) => {
@@ -148,7 +156,7 @@ export default function InputLinearSlider(props: InputLinearSliderProps) {
         <InputLinearSliderBox $sliderWidthPx={props.sliderWidthPx ?? 100} onPointerDown={props.stopPointerDownPropagation ? e => e.stopPropagation() : undefined}>
             <Gutter ref={gutterRef}>
                 <GutterClip {...drag}>
-                    <ProgressBar $pixelWidth={styleValue}>
+                    <ProgressBar $pixelWidth={value}>
                         <InputLinearSliderHandle
                             ref={handleRef}
                             // onMouseDown={onMouseDown}
