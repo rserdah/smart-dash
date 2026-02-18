@@ -126,8 +126,18 @@ const rooms: RoomData[] = [
 
 export default function Home() {
     const [roomId, setRoomId] = useState('living_room');
+    const [widgets, setWidgets] = useState([]);
     const [checked, setChecked] = useState(false);
     const modal = useModal();
+
+    useEffect(() => {
+        fetch('http://localhost:4000/api/widgets')
+            .then(res => res.json())
+            .then(json => { setWidgets(json); return json; })
+            .then(json => { console.log('widgets', json); })
+            .catch(e => console.error(e))
+    }, []);
+    
 
     const currentRoom = rooms.find(x => x.id == roomId);
 
@@ -142,6 +152,17 @@ export default function Home() {
 
                 <MainContentBox>
                     <DashboardGrid>
+                        {
+                            widgets.map((x: any) => (
+                                <WidgetSlot $col={x.col} $row={x.row} $colSpan={x.colSpan} $rowSpan={x.rowSpan}>
+                                    { x.type == 'light' && <LightWidget grid={{col: x.col, row: x.row, colSpan: x.colSpan, rowSpan: x.rowSpan}} /> }
+                                    { x.type == 'weather' && <WeatherWidget grid={{col: x.col, row: x.row, colSpan: x.colSpan, rowSpan: x.rowSpan}} /> }
+                                </WidgetSlot>
+                            ))
+                        }
+                    </DashboardGrid>
+
+                    {/* <DashboardGrid>
                         <WidgetSlot $col={1} $row={1} $colSpan={8} $rowSpan={2}>
                             <LightWidget grid={{col: 1, row: 1, colSpan: 1, rowSpan: 1}} />
                         </WidgetSlot>
@@ -338,7 +359,7 @@ export default function Home() {
                                 )}
                             />
                         </WidgetSlot>
-                    </DashboardGrid>
+                    </DashboardGrid> */}
                 </MainContentBox>
 
                 <RoomSelectorBox>
