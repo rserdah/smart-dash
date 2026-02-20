@@ -1,0 +1,18 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Widget {
+  id          Int     @id @default(autoincrement())
+  type        String
+  title       String
+  col         Int
+  row         Int
+  colSpan     Int
+  rowSpan     Int
+}
