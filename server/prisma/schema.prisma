@@ -1,18 +1,26 @@
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+    provider = "sqlite"
+    url      = "file:./dev.db"
 }
 
 model Widget {
-  id          Int     @id @default(autoincrement())
-  type        String
-  title       String
-  col         Int
-  row         Int
-  colSpan     Int
-  rowSpan     Int
+    id           Int         @id @default(autoincrement())
+    type         String
+    title        String
+    col          Int
+    row          Int
+    colSpan      Int
+    rowSpan      Int
+}
+
+model Device {
+    id           Int         @id @default(autoincrement())
+    name         String
+    type         String
+    state        String
+    createdAt    DateTime    @default(now())
 }
