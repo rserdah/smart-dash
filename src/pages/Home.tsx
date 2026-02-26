@@ -15,8 +15,10 @@ import { useEffect, useState } from 'react';
 import MaterialIcon from '@/components/MaterialIcon';
 import { LightWidget } from '@/widgets/light/LightWidget';
 import { WeatherWidget } from '@/widgets/weather/WeatherWidget';
+import { DeviceWidget } from '@/widgets/device/DeviceWidget';
 import WidgetController from '@/widgets/WidgetController';
 import ExpandedWidget from '@/widgets/ExpandedWidget';
+import { fetchDevices } from '@/api/devices';
 
 // IMPORTANT! styled.element variables CANNOT be defined inside the functional component or else they will unmount every time the functional component re-renders
 const ImgBackground = styled.img`
@@ -137,7 +139,6 @@ export default function Home() {
             .then(json => { console.log('widgets', json); })
             .catch(e => console.error(e))
     }, []);
-    
 
     const currentRoom = rooms.find(x => x.id == roomId);
 
@@ -157,6 +158,7 @@ export default function Home() {
                                 <WidgetSlot $col={x.col} $row={x.row} $colSpan={x.colSpan} $rowSpan={x.rowSpan}>
                                     { x.type == 'light' && <LightWidget grid={{col: x.col, row: x.row, colSpan: x.colSpan, rowSpan: x.rowSpan}} /> }
                                     { x.type == 'weather' && <WeatherWidget grid={{col: x.col, row: x.row, colSpan: x.colSpan, rowSpan: x.rowSpan}} /> }
+                                    { x.type == 'device' && <DeviceWidget id={x.deviceId} device={x.device} grid={{col: x.col, row: x.row, colSpan: x.colSpan, rowSpan: x.rowSpan}} /> }
                                 </WidgetSlot>
                             ))
                         }

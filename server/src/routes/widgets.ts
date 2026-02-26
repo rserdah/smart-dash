@@ -6,7 +6,11 @@ const router = express.Router();
 // GET all widgets
 router.get('/', async (req, res) => {
     try {
-        const widgets = await prisma.widget.findMany();
+        const widgets = await prisma.widget.findMany({
+            include: {
+                device: true,
+            },
+        });
         res.json(widgets);
     }
     catch(e) {
