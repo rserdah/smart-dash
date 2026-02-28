@@ -156,7 +156,7 @@ export default function Home() {
                         {
                             widgets.map((x: any) => (
                                 <WidgetSlot $col={x.col} $row={x.row} $colSpan={x.colSpan} $rowSpan={x.rowSpan}>
-                                    { x.type == 'light' && <LightWidget grid={{col: x.col, row: x.row, colSpan: x.colSpan, rowSpan: x.rowSpan}} /> }
+                                    {/* { x.type == 'light' && <LightWidget grid={{col: x.col, row: x.row, colSpan: x.colSpan, rowSpan: x.rowSpan}} /> } */}
                                     { x.type == 'weather' && <WeatherWidget grid={{col: x.col, row: x.row, colSpan: x.colSpan, rowSpan: x.rowSpan}} /> }
                                     { x.type == 'device' && <DeviceWidget id={x.deviceId} device={x.device} grid={{col: x.col, row: x.row, colSpan: x.colSpan, rowSpan: x.rowSpan}} /> }
                                 </WidgetSlot>

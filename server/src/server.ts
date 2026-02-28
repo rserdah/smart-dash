@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import widgetRouter from './routes/widgets';
-import deviceRouter from './routes/devices';
+import deviceRouter from './routes/devices/devices';
 
 const app = express();
 const port = 4000;

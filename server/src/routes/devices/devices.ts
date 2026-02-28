@@ -1,9 +1,12 @@
 import express from 'express';
-import { prisma } from '../lib/prisma';
-import { DeviceService } from '../services/deviceServices';
+import { prisma } from '../../lib/prisma';
+import { DeviceService } from '../../services/deviceServices';
+import thermostatRouter from './thermostat/thermostat';
 
 const router = express.Router();
 const service = new DeviceService();
+
+router.use('/thermostat', thermostatRouter);
 
 // GET all devices
 router.get('/', async (req, res) => {

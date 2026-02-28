@@ -1,7 +1,5 @@
-import styled from '@emotion/styled';
-import WidgetController from '../WidgetController';
-import DeviceWidgetCompactContent from './DeviceWidgetCompactContent';
-import { useDeviceWidget } from './useDeviceWidget';
+import { LightWidget } from './type/light/LightWidget';
+import { ThermostatWidget } from './type/thermostat/ThermostatWidget';
 
 type Props = {
     grid: {
@@ -14,16 +12,21 @@ type Props = {
     device: any;
 };
 
-export function DeviceWidget({ grid, id, device: _device }: Props) {
-    const device = useDeviceWidget(id);
+const TypeRegistry = {
+    'light': LightWidget,
+    'switch': null,
+    'sensor': null,
+    'thermostat': ThermostatWidget,
+};
 
-    // The expanded and compact widgets are currently the same
-    const content = (props: any) => <DeviceWidgetCompactContent device={_device} state={device.state} actions={device.actions} setExpanded={props.setExpanded} expanded={props.expanded} />;
+export function DeviceWidget({ grid, id, device: _device }: Props) {
+    const Widget = TypeRegistry[(_device.type as keyof typeof TypeRegistry)];
+
+    if(!Widget) {
+        return <>N/A</>
+    }
 
     return (
-        <WidgetController
-            compactRender={content}
-            expandedRender={content}
-        />
+        <Widget grid={grid} id={id} device={_device} />
     )
 }
