@@ -6,6 +6,20 @@ export type DeviceType =
     | 'sensor'
     | 'thermostat';
 
+export enum DeviceErrorCode {
+    UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+    DEVICE_NOT_FOUND = 'DEVICE_NOT_FOUND',
+    UNSUPPORTED_CAPABILITY = 'UNSUPPORTED_CAPABILITY',
+    INVALID_TEMPERATURE = 'INVALID_TEMPERATURE',
+};
+
+export const deviceErrorHttpMap: Record<DeviceErrorCode, number> = {
+    [DeviceErrorCode.UNKNOWN_ERROR]: 500, // ?
+    [DeviceErrorCode.DEVICE_NOT_FOUND]: 404,
+    [DeviceErrorCode.UNSUPPORTED_CAPABILITY]: 400,
+    [DeviceErrorCode.INVALID_TEMPERATURE]: 400,
+};
+
 export class DeviceService {
     async getAll() {
         return await prisma.device.findMany();
@@ -19,7 +33,7 @@ export class DeviceService {
         const device = await prisma.device.findUnique({ where: { id } });
 
         if(!device) {
-            throw new Error('Device not found');
+            throw new Error(DeviceErrorCode.DEVICE_NOT_FOUND);
         }
 
         // TODO: Improve it so actions are not tied to types, but rather types have capabilities and then simply check the capability
@@ -38,7 +52,7 @@ export class DeviceService {
             OR use a bitmask to represent capabilities and store that as a column
         */
         if(device.type !== 'light' && device.type !== 'switch') {
-            throw new Error('This device cannot be toggled');
+            throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY);
         }
 
         const newState = device.state === 'on' ? 'off' : 'on';
@@ -49,15 +63,16 @@ export class DeviceService {
         });
     }
 
-    async setTemperature(id: number, temp: number) {
+    async setTargetTemperature(id: number, temp: number) {
         const device = await prisma.device.findUnique({ where: { id } });
 
         if(!device) {
-            throw new Error('Device not found');
+            throw new Error(DeviceErrorCode.DEVICE_NOT_FOUND);
         }
 
+        // TODO: Change to read from a capability column (e.g. if(!device.capabilities?.temperature)...)
         if(device.type !== 'thermostat') {
-            throw new Error('This device is not a thermostat');
+            throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY);
         }
 
         return await prisma.device.update({
