@@ -8,23 +8,24 @@ datasource db {
 }
 
 model Widget {
-    id           Int         @id @default(autoincrement())
-    type         String
-    title        String
-    col          Int
-    row          Int
-    colSpan      Int
-    rowSpan      Int
-    deviceId     Int?
-    device       Device?     @relation(fields: [deviceId], references: [id])
+    id                              Int                             @id @default(autoincrement())
+    type                            String
+    title                           String
+    col                             Int
+    row                             Int
+    colSpan                         Int
+    rowSpan                         Int
+    deviceId                        Int?
+    device                          Device?                         @relation(fields: [deviceId], references: [id])
 }
 
 model Device {
-    id           Int         @id @default(autoincrement())
-    name         String
-    type         String
-    state        String
-    createdAt    DateTime    @default(now())
+    id                              Int                             @id @default(autoincrement())
+    name                            String
+    type                            String
+    capabilities                    Json                            @default("[]")
+    state                           String
+    createdAt                       DateTime                        @default(now())
 
-    widgets   Widget[]
+    widgets                         Widget[]
 }

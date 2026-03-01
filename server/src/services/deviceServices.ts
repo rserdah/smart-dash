@@ -11,6 +11,7 @@ export enum DeviceErrorCode {
     DEVICE_NOT_FOUND = 'DEVICE_NOT_FOUND',
     MALFORMED_DEVICE_STATE_JSON = 'MALFORMED_DEVICE_STATE_JSON',
     UNSUPPORTED_CAPABILITY = 'UNSUPPORTED_CAPABILITY',
+    MALFORMED_DEVICE_CAPABILITY_JSON = 'MALFORMED_DEVICE_CAPABILITY_JSON',
     INVALID_TEMPERATURE = 'INVALID_TEMPERATURE',
 };
 
@@ -19,6 +20,7 @@ export const deviceErrorHttpMap: Record<DeviceErrorCode, number> = {
     [DeviceErrorCode.DEVICE_NOT_FOUND]: 404,
     [DeviceErrorCode.MALFORMED_DEVICE_STATE_JSON]: 500, // ?
     [DeviceErrorCode.UNSUPPORTED_CAPABILITY]: 400,
+    [DeviceErrorCode.MALFORMED_DEVICE_CAPABILITY_JSON]: 500, // ?
     [DeviceErrorCode.INVALID_TEMPERATURE]: 400,
 };
 
@@ -50,28 +52,10 @@ export class DeviceService {
     async toggle(id: number) {
         const device = await prisma.device.findUnique({ where: { id } });
 
-        if(!device) {
-            throw new Error(DeviceErrorCode.DEVICE_NOT_FOUND);
-        }
-
-        // TODO: Improve it so actions are not tied to types, but rather types have capabilities and then simply check the capability
-        /*
-            E.g. light: {
-                // Represents 'toggle'
-                power: true,
-                brightness: true
-            }
-
-            TV {
-                power: true,
-                volume: true
-            }
-
-            OR use a bitmask to represent capabilities and store that as a column
-        */
-        if(device.type !== 'light' && device.type !== 'switch') {
-            throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY);
-        }
+        if(!device) { throw new Error(DeviceErrorCode.DEVICE_NOT_FOUND); }
+        if(device.capabilities == null) { throw new Error(DeviceErrorCode.MALFORMED_DEVICE_CAPABILITY_JSON); }
+        if(!Array.isArray(device.capabilities)) { throw new Error(DeviceErrorCode.MALFORMED_DEVICE_CAPABILITY_JSON); }
+        if(!device.capabilities.includes('power')) { throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY); }
 
         const state = parseDeviceState(device.state);
 
@@ -99,14 +83,10 @@ export class DeviceService {
     async setTargetTemperature(id: number, temp: number) {
         const device = await prisma.device.findUnique({ where: { id } });
 
-        if(!device) {
-            throw new Error(DeviceErrorCode.DEVICE_NOT_FOUND);
-        }
-
-        // TODO: Change to read from a capability column (e.g. if(!device.capabilities?.temperature)...)
-        if(device.type !== 'thermostat') {
-            throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY);
-        }
+        if(!device) { throw new Error(DeviceErrorCode.DEVICE_NOT_FOUND); }
+        if(device.capabilities == null) { throw new Error(DeviceErrorCode.MALFORMED_DEVICE_CAPABILITY_JSON); }
+        if(!Array.isArray(device.capabilities)) { throw new Error(DeviceErrorCode.MALFORMED_DEVICE_CAPABILITY_JSON); }
+        if(!device.capabilities.includes('targetTemperature')) { throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY); }
 
         const state = parseDeviceState(device.state);
 
