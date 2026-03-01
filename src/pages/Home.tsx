@@ -13,7 +13,6 @@ import { useModal } from '@/modals/ModalContext';
 import { ModalProps, ModalBody, ModalFooter, ModalFooterBtn } from '@/modals/ModalShell';
 import { useEffect, useState } from 'react';
 import MaterialIcon from '@/components/MaterialIcon';
-import { LightWidget } from '@/widgets/light/LightWidget';
 import { WeatherWidget } from '@/widgets/weather/WeatherWidget';
 import { DeviceWidget } from '@/widgets/device/DeviceWidget';
 import WidgetController from '@/widgets/WidgetController';
@@ -136,7 +135,6 @@ export default function Home() {
         fetch('http://localhost:4000/api/widgets')
             .then(res => res.json())
             .then(json => { setWidgets(json); return json; })
-            .then(json => { console.log('widgets', json); })
             .catch(e => console.error(e))
     }, []);
 
@@ -154,9 +152,8 @@ export default function Home() {
                 <MainContentBox>
                     <DashboardGrid>
                         {
-                            widgets.map((x: any) => (
-                                <WidgetSlot $col={x.col} $row={x.row} $colSpan={x.colSpan} $rowSpan={x.rowSpan}>
-                                    {/* { x.type == 'light' && <LightWidget grid={{col: x.col, row: x.row, colSpan: x.colSpan, rowSpan: x.rowSpan}} /> } */}
+                            widgets.map((x: any, i: number) => (
+                                <WidgetSlot key={`${x.name}_${x.col}_${x.row}_${x.colSpan}_${x.rowSpan}_${i}`} $col={x.col} $row={x.row} $colSpan={x.colSpan} $rowSpan={x.rowSpan}>
                                     { x.type == 'weather' && <WeatherWidget grid={{col: x.col, row: x.row, colSpan: x.colSpan, rowSpan: x.rowSpan}} /> }
                                     { x.type == 'device' && <DeviceWidget id={x.deviceId} device={x.device} grid={{col: x.col, row: x.row, colSpan: x.colSpan, rowSpan: x.rowSpan}} /> }
                                 </WidgetSlot>
@@ -368,8 +365,8 @@ export default function Home() {
                     {/* <ToggleButtonGroup name='togglebuttongroup1' options={[{ label: 'Home', value: 'home' }, { label: 'Lighting', value: 'lighting' }, { label: 'Settings', value: 'settings' }, ]} /> */}
                     
                     {
-                        rooms.map(x => (
-                            <RoomSelectorBtn onClick={e => setRoomId(r => x.id)} $active={x.id == currentRoom?.id}>{x.name}</RoomSelectorBtn>
+                        rooms.map((x, i) => (
+                            <RoomSelectorBtn key={`${x.name}_${x.id}_${i}`} onClick={e => setRoomId(r => x.id)} $active={x.id == currentRoom?.id}>{x.name}</RoomSelectorBtn>
                         ))
                     }
                     
