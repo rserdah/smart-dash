@@ -9,6 +9,7 @@ export type DeviceType =
 export enum DeviceErrorCode {
     UNKNOWN_ERROR = 'UNKNOWN_ERROR',
     DEVICE_NOT_FOUND = 'DEVICE_NOT_FOUND',
+    MALFORMED_DEVICE_STATE_JSON = 'MALFORMED_DEVICE_STATE_JSON',
     UNSUPPORTED_CAPABILITY = 'UNSUPPORTED_CAPABILITY',
     INVALID_TEMPERATURE = 'INVALID_TEMPERATURE',
 };
@@ -16,9 +17,26 @@ export enum DeviceErrorCode {
 export const deviceErrorHttpMap: Record<DeviceErrorCode, number> = {
     [DeviceErrorCode.UNKNOWN_ERROR]: 500, // ?
     [DeviceErrorCode.DEVICE_NOT_FOUND]: 404,
+    [DeviceErrorCode.MALFORMED_DEVICE_STATE_JSON]: 500, // ?
     [DeviceErrorCode.UNSUPPORTED_CAPABILITY]: 400,
     [DeviceErrorCode.INVALID_TEMPERATURE]: 400,
 };
+
+function parseDeviceState(json: string) {
+    let finalState;
+    try {
+        finalState = JSON.parse(json);
+    }
+    catch(e) {
+        throw new Error(DeviceErrorCode.MALFORMED_DEVICE_STATE_JSON);
+    }
+
+    if(finalState == null || typeof finalState !== 'object') {
+        throw new Error(DeviceErrorCode.MALFORMED_DEVICE_STATE_JSON);
+    }
+
+    return finalState;
+}
 
 export class DeviceService {
     async getAll() {
@@ -55,12 +73,27 @@ export class DeviceService {
             throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY);
         }
 
-        const newState = device.state === 'on' ? 'off' : 'on';
+        const state = parseDeviceState(device.state);
 
-        return await prisma.device.update({
+        if(typeof state.power !== 'boolean') { throw new Error(DeviceErrorCode.MALFORMED_DEVICE_STATE_JSON); }
+
+        const power = state.power;
+
+        const newState = {
+            ...state,
+            power: !power,
+        };
+
+        const newStateJson = JSON.stringify(newState);
+
+        const updated = await prisma.device.update({
             where: { id },
-            data: { state: newState },
+            data: { state: newStateJson },
         });
+
+        const finalState = parseDeviceState(updated.state);
+
+        return finalState;
     }
 
     async setTargetTemperature(id: number, temp: number) {
@@ -75,10 +108,23 @@ export class DeviceService {
             throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY);
         }
 
-        return await prisma.device.update({
+        const state = parseDeviceState(device.state);
+
+        const newState = {
+            ...state,
+            targetTemperature: temp,
+        };
+
+        const newStateJson = JSON.stringify(newState);
+
+        const updated = await prisma.device.update({
             where: { id },
-            data: { state: temp.toString() },
+            data: { state: newStateJson },
         });
+
+        const finalState = parseDeviceState(updated.state);
+
+        return finalState;
     }
 
     async create(name: string, type: string, initialState='off') {
