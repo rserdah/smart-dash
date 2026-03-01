@@ -21,6 +21,7 @@ router.get('/', async (req, res, next) => {
         res.json(devices);
     }
     catch(err) {
+        console.error(err);
         next(err);
     }
 });
@@ -35,6 +36,7 @@ router.get('/:id', async (req, res, next) => {
         res.json(device);
     }
     catch(err) {
+        console.error(err);
         next(err);
     }
 });
@@ -49,6 +51,7 @@ router.post('/', async (req, res, next) => {
         res.json(device);
     }
     catch(err) {
+        console.error(err);
         next(err);
     }
 });

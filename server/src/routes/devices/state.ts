@@ -5,8 +5,8 @@ import { DeviceService } from '../../services/deviceServices';
 const router = express.Router();
 const service = new DeviceService();
 
-// POST toggle device power
-router.post('/:id/power', async (req, res, next) => {
+// PATCH toggle device power
+router.patch('/:id/power', async (req, res, next) => {
     try {
         const id = Number(req.params.id);
 
@@ -15,6 +15,7 @@ router.post('/:id/power', async (req, res, next) => {
         res.json(updated);
     }
     catch(err) {
+        console.error(err);
         next(err);
     }
 });
@@ -30,6 +31,7 @@ router.patch('/:id/temperature', async (req, res, next) => {
         res.json(updated);
     }
     catch(err) {
+        console.error(err);
         next(err);
     }
 });
