@@ -1,54 +1,62 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchDevice, toggleDevice } from '@/api/devices';
+import { fetchDevice, toggleDevicePower, setDeviceTemperature } from '@/api/devices';
 
 export type DeviceState = {
-    isOn: boolean;
-    isSwitchOn: boolean;
-    brightness: number;
-};
+} | any;
 
 export type DeviceActions = {
-    toggle: () => void;
-    toggleSwitch: () => void;
-    setBrightness: (value: number) => void;
-};
+} | any;
 
-export function useDeviceWidget(deviceId: number) {
-    const [state, setState] = useState<DeviceState>({
-        isOn: false,
-        isSwitchOn: false,
-        brightness: 50,
-    });
+export function useDevice(device: any) {
+    const [state, setState] = useState<DeviceState>({});
 
-    const toggle = useCallback(() => {
-        setState(s => ({ ...s, isOn: !s.isOn }))
-    }, [setState]);
+    const deviceId: number = device.id;
+    const deviceType = device.type;
 
-    const toggleSwitch = useCallback(async () => {
-        const result = await toggleDevice(deviceId);
+    const togglePower = useCallback(async () => {
+        const result = await toggleDevicePower(deviceId);
 
-        setState(s => ({ ...s, isSwitchOn: result.state === 'on' }));
+        if(result && typeof result.power === 'boolean') {
+            setState((s: any) => ({ ...s, power: result.power }));
+        }
     }, [deviceId, setState]);
 
-    const setBrightness = useCallback((value: number) => {
-        setState(s => ({
+    const setTemperature = useCallback(async (value: number) => {
+        const result = await setDeviceTemperature(deviceId, value);
+
+        setState((s: any) => ({
             ...s,
-            brightness: Math.max(0, Math.min(100, value)),
+            targetTemperature: Math.max(30, Math.min(90, value)),
         }));
-    }, [setState]);
+    }, [deviceId, setState]);
 
     useEffect(() => {
-        fetchDevice(deviceId).then(data => {
-            setState(s => ({ ...s, isSwitchOn: data.state === 'on' }))
-        });
-    }, [deviceId]);
+        let stateParsed;
+        
+        try {
+            stateParsed = JSON.parse(device.state);
+        }
+        catch(e) {
+            console.warn('Device state is not valid JSON');
+            stateParsed = {};
+        }
+
+        setState((s: any) => stateParsed);
+    }, [deviceId, setState]);
+
+    const actions: DeviceActions = {};
+
+    // TODO: Add capabilities to devices table, then here, go through the device capabilities and conditionally add actions based on each capability
+    if(['light', 'switch', 'thermostat'].includes(deviceType)) {
+        actions.togglePower = togglePower;
+    }
+
+    if(['thermostat'].includes(deviceType)) {
+        actions.setTemperature = setTemperature;
+    }
 
     return {
         state,
-        actions: {
-            toggle,
-            toggleSwitch,
-            setBrightness,
-        },
+        actions,
     };
 }
