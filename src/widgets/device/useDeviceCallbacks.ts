@@ -17,11 +17,13 @@ export function useDeviceCallbacks(device: any, setState: Dispatch<any>) {
     }, [deviceId, setState]);
 
     const setTemperature = useCallback(async (value: number) => {
-        const result = await setDeviceTemperature(deviceId, value);
+        const newValue = Math.max(30, Math.min(90, value));
+
+        const result = await setDeviceTemperature(deviceId, newValue);
 
         setState((s: any) => ({
             ...s,
-            targetTemperature: Math.max(30, Math.min(90, value)),
+            targetTemperature: result.targetTemperature,
         }));
     }, [deviceId, setState]);
     
