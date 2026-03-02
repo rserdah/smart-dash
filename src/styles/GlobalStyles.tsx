@@ -5,7 +5,7 @@ const styles = css`
         font-size: 16px;
     }
 
-    body {       
+    body {
         font-family: "Onest", sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial;
         font-optical-sizing: auto;
         font-weight: 500;
