@@ -1,4 +1,5 @@
 import { prisma } from '../lib/prisma';
+import { getDeviceProvider } from '../providers';
 
 export type DeviceType =
     | 'light'
@@ -24,7 +25,7 @@ export const deviceErrorHttpMap: Record<DeviceErrorCode, number> = {
     [DeviceErrorCode.INVALID_TEMPERATURE]: 400,
 };
 
-function parseDeviceState(json: string) {
+export function parseDeviceState(json: string) {
     let finalState;
     try {
         finalState = JSON.parse(json);
@@ -57,23 +58,9 @@ export class DeviceService {
         if(!Array.isArray(device.capabilities)) { throw new Error(DeviceErrorCode.MALFORMED_DEVICE_CAPABILITY_JSON); }
         if(!device.capabilities.includes('power')) { throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY); }
 
-        const state = parseDeviceState(device.state);
+        const provider = getDeviceProvider(device.provider);
 
-        if(typeof state.power !== 'boolean') { throw new Error(DeviceErrorCode.MALFORMED_DEVICE_STATE_JSON); }
-
-        const power = state.power;
-
-        const newState = {
-            ...state,
-            power: !power,
-        };
-
-        const newStateJson = JSON.stringify(newState);
-
-        const updated = await prisma.device.update({
-            where: { id },
-            data: { state: newStateJson },
-        });
+        const updated = await provider.toggle(device);
 
         const finalState = parseDeviceState(updated.state);
 
@@ -88,19 +75,9 @@ export class DeviceService {
         if(!Array.isArray(device.capabilities)) { throw new Error(DeviceErrorCode.MALFORMED_DEVICE_CAPABILITY_JSON); }
         if(!device.capabilities.includes('targetTemperature')) { throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY); }
 
-        const state = parseDeviceState(device.state);
+        const provider = getDeviceProvider(device.provider);
 
-        const newState = {
-            ...state,
-            targetTemperature: temp,
-        };
-
-        const newStateJson = JSON.stringify(newState);
-
-        const updated = await prisma.device.update({
-            where: { id },
-            data: { state: newStateJson },
-        });
+        const updated = await provider.setTargetTemperature(device, temp);
 
         const finalState = parseDeviceState(updated.state);
 

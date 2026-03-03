@@ -19,10 +19,18 @@ model Widget {
     device                          Device?                         @relation(fields: [deviceId], references: [id])
 }
 
+enum DeviceProvider {
+    LOCAL
+    HOME_ASSISTANT
+    SMARTTHINGS
+    CUSTOM_RPI
+}
+
 model Device {
     id                              Int                             @id @default(autoincrement())
     name                            String
     type                            String
+    provider                        DeviceProvider                  @default(LOCAL)
     capabilities                    Json                            @default("[]")
     state                           String
     createdAt                       DateTime                        @default(now())
