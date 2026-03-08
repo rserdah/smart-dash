@@ -5,28 +5,12 @@ import { DeviceService } from '../../services/deviceServices';
 const router = express.Router();
 const service = new DeviceService();
 
-// PATCH toggle device power
-router.patch('/:id/power', async (req, res, next) => {
+// PATCH device state
+router.patch('/:id/state', async (req, res, next) => {
     try {
         const id = Number(req.params.id);
 
-        const updated = await service.toggle(id);
-
-        res.json(updated);
-    }
-    catch(err) {
-        console.error(err);
-        next(err);
-    }
-});
-
-// PATCH set device temperature (mostly only for thermostats)
-router.patch('/:id/temperature', async (req, res, next) => {
-    try {
-        const id = Number(req.params.id);
-        const { targetTemperature } = req.body;
-
-        const updated = await service.setTargetTemperature(id, targetTemperature);
+        const updated = await service.updateDevice(id, req.body);
 
         res.json(updated);
     }

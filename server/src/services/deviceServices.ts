@@ -1,5 +1,6 @@
 import { prisma } from '../lib/prisma';
 import { getDeviceProvider } from '../providers';
+import { BaseDeviceState } from '../types/devices/types/device.types';
 
 export type DeviceType =
     | 'light'
@@ -10,6 +11,7 @@ export type DeviceType =
 export enum DeviceErrorCode {
     UNKNOWN_ERROR = 'UNKNOWN_ERROR',
     DEVICE_NOT_FOUND = 'DEVICE_NOT_FOUND',
+    UNSUPPORTED_DEVICE_TYPE = 'UNSUPPORTED_DEVICE_TYPE',
     MALFORMED_DEVICE_STATE_JSON = 'MALFORMED_DEVICE_STATE_JSON',
     UNSUPPORTED_CAPABILITY = 'UNSUPPORTED_CAPABILITY',
     MALFORMED_DEVICE_CAPABILITY_JSON = 'MALFORMED_DEVICE_CAPABILITY_JSON',
@@ -19,27 +21,12 @@ export enum DeviceErrorCode {
 export const deviceErrorHttpMap: Record<DeviceErrorCode, number> = {
     [DeviceErrorCode.UNKNOWN_ERROR]: 500, // ?
     [DeviceErrorCode.DEVICE_NOT_FOUND]: 404,
+    [DeviceErrorCode.UNSUPPORTED_DEVICE_TYPE]: 400, // ?
     [DeviceErrorCode.MALFORMED_DEVICE_STATE_JSON]: 500, // ?
     [DeviceErrorCode.UNSUPPORTED_CAPABILITY]: 400,
     [DeviceErrorCode.MALFORMED_DEVICE_CAPABILITY_JSON]: 500, // ?
     [DeviceErrorCode.INVALID_TEMPERATURE]: 400,
 };
-
-export function parseDeviceState(json: string) {
-    let finalState;
-    try {
-        finalState = JSON.parse(json);
-    }
-    catch(e) {
-        throw new Error(DeviceErrorCode.MALFORMED_DEVICE_STATE_JSON);
-    }
-
-    if(finalState == null || typeof finalState !== 'object') {
-        throw new Error(DeviceErrorCode.MALFORMED_DEVICE_STATE_JSON);
-    }
-
-    return finalState;
-}
 
 export class DeviceService {
     async getAll() {
@@ -50,38 +37,41 @@ export class DeviceService {
         return await prisma.device.findUnique({ where: { id } });
     }
 
-    async toggle(id: number) {
+    async updateDevice(id: number, state: Partial<BaseDeviceState>) {
         const device = await prisma.device.findUnique({ where: { id } });
 
         if(!device) { throw new Error(DeviceErrorCode.DEVICE_NOT_FOUND); }
-        if(device.capabilities == null) { throw new Error(DeviceErrorCode.MALFORMED_DEVICE_CAPABILITY_JSON); }
-        if(!Array.isArray(device.capabilities)) { throw new Error(DeviceErrorCode.MALFORMED_DEVICE_CAPABILITY_JSON); }
-        if(!device.capabilities.includes('power')) { throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY); }
 
         const provider = getDeviceProvider(device.provider);
 
-        const updated = await provider.toggle(device);
+        if(!provider) {
+            throw new Error('Provider not found');
+        }
 
-        const finalState = parseDeviceState(updated.state);
+        switch(device.type as DeviceType) {
+            case 'light':
+                if(typeof provider.updateLight === 'function') {
+                    return provider.updateLight(device, state);
+                }
 
-        return finalState;
-    }
+            case 'switch':
+                if(typeof provider.updateSwitch === 'function') {
+                    return provider.updateSwitch(device, state);
+                }
 
-    async setTargetTemperature(id: number, temp: number) {
-        const device = await prisma.device.findUnique({ where: { id } });
+            // case 'sensor':
+            //     if(typeof provider.updateSensor === 'function') {
+            //         return provider.updateSensor(device, state);
+            //     }
 
-        if(!device) { throw new Error(DeviceErrorCode.DEVICE_NOT_FOUND); }
-        if(device.capabilities == null) { throw new Error(DeviceErrorCode.MALFORMED_DEVICE_CAPABILITY_JSON); }
-        if(!Array.isArray(device.capabilities)) { throw new Error(DeviceErrorCode.MALFORMED_DEVICE_CAPABILITY_JSON); }
-        if(!device.capabilities.includes('targetTemperature')) { throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY); }
+            case 'thermostat':
+                if(typeof provider.updateClimate === 'function') {
+                    return provider.updateClimate(device, state);
+                }
 
-        const provider = getDeviceProvider(device.provider);
-
-        const updated = await provider.setTargetTemperature(device, temp);
-
-        const finalState = parseDeviceState(updated.state);
-
-        return finalState;
+            default:
+                throw new Error(DeviceErrorCode.UNSUPPORTED_DEVICE_TYPE);
+        }
     }
 
     async create(name: string, type: string, initialState='off') {
