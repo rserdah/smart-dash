@@ -1,6 +1,7 @@
 import { Device } from '@prisma/client';
 import { DeviceProvider } from './types';
 import { prisma } from '../lib/prisma';
+import { validateBaseDeviceCapabilities } from '../types/devices/types/device.types';
 import { LightState, validateLightState, parseLightState } from '../types/devices/types/light.types';
 import { SwitchState, validateSwitchState, parseSwitchState } from '../types/devices/types/switch.types';
 import { ClimateState, validateClimateState, parseClimateState } from '../types/devices/types/climate.types';
@@ -12,6 +13,16 @@ export const localProvider: DeviceProvider = {
 
         if(!validateLightState(state)) {
             throw new Error(DeviceErrorCode.MALFORMED_DEVICE_STATE_JSON);
+        }
+
+        if(device.capabilities == null || typeof device.capabilities == 'number' || typeof device.capabilities == 'boolean') {
+            throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY);
+        }
+
+        const capabilities = device.capabilities as (keyof LightState)[];
+
+        if(!validateBaseDeviceCapabilities(state, capabilities)) {
+            throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY);
         }
 
         const newState = {
@@ -36,6 +47,16 @@ export const localProvider: DeviceProvider = {
             throw new Error(DeviceErrorCode.MALFORMED_DEVICE_STATE_JSON);
         }
 
+        if(device.capabilities == null || typeof device.capabilities == 'number' || typeof device.capabilities == 'boolean') {
+            throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY);
+        }
+
+        const capabilities = device.capabilities as (keyof SwitchState)[];
+
+        if(!validateBaseDeviceCapabilities(state, capabilities)) {
+            throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY);
+        }
+
         const newState = {
             ...currentState,
             ...state,
@@ -56,6 +77,16 @@ export const localProvider: DeviceProvider = {
 
         if(!validateClimateState(state)) {
             throw new Error(DeviceErrorCode.MALFORMED_DEVICE_STATE_JSON);
+        }
+
+        if(device.capabilities == null || typeof device.capabilities == 'number' || typeof device.capabilities == 'boolean') {
+            throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY);
+        }
+
+        const capabilities = device.capabilities as (keyof ClimateState)[];
+
+        if(!validateBaseDeviceCapabilities(state, capabilities)) {
+            throw new Error(DeviceErrorCode.UNSUPPORTED_CAPABILITY);
         }
 
         const newState = {

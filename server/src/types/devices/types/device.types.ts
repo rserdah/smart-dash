@@ -18,6 +18,18 @@ export function validateBaseDeviceState(state: Partial<BaseDeviceState>): boolea
     return true;
 }
 
+export function validateBaseDeviceCapabilities<T>(state: Partial<T>, capabilities: (keyof T)[]): boolean {
+    const extraKeys = Object.keys(state).filter(stateKey => !capabilities.includes(stateKey as any));
+
+    if(extraKeys.length > 0) {
+        // TODO: Make this throw an error/connect to the response
+        console.error(`Unsupported capabilities: ${extraKeys.join(', ')}`);
+        return false;
+    }
+
+    return true;
+}
+
 export function parseBaseDeviceState(json: string): BaseDeviceState {
     let finalState;
     try {
