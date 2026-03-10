@@ -6,6 +6,8 @@ export interface LightState extends BaseDeviceState {
     color?: string;
 }
 
+const LightStateKeys: (keyof LightState)[] = ['power', 'brightness', 'color'];
+
 export function validateLightState(state: Partial<LightState>): boolean {
     const { brightness, color } = state;
 
@@ -14,6 +16,14 @@ export function validateLightState(state: Partial<LightState>): boolean {
         brightness !== undefined && typeof brightness !== 'number' ||
         color !== undefined && typeof color !== 'string'
     ) {
+        return false;
+    }
+
+    const extraKeys = Object.keys(state).filter(stateKey => !LightStateKeys.includes(stateKey as any));
+
+    if(extraKeys.length > 0) {
+        // TODO: Make this throw an error/connect to the response
+        console.error(`Unknown keys present: ${extraKeys.join(', ')}`);
         return false;
     }
 

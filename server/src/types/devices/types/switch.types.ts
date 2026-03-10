@@ -3,12 +3,22 @@ import { BaseDeviceState, parseBaseDeviceState, validateBaseDeviceState } from "
 
 export interface SwitchState extends BaseDeviceState {}
 
+const SwitchStateKeys: (keyof SwitchState)[] = ['power'];
+
 export function validateSwitchState(state: Partial<SwitchState>): boolean {
     // const {  } = state;
 
     if(
         !validateBaseDeviceState(state)
     ) {
+        return false;
+    }
+
+    const extraKeys = Object.keys(state).filter(stateKey => !SwitchStateKeys.includes(stateKey as any));
+
+    if(extraKeys.length > 0) {
+        // TODO: Make this throw an error/connect to the response
+        console.error(`Unknown keys present: ${extraKeys.join(', ')}`);
         return false;
     }
 

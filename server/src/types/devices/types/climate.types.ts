@@ -6,6 +6,8 @@ export interface ClimateState extends BaseDeviceState {
     mode?: 'heat' | 'cool' | 'auto';
 }
 
+const ClimateStateKeys: (keyof ClimateState)[] = ['power', 'targetTemperature', 'mode'];
+
 export function validateClimateState(state: Partial<ClimateState>): boolean {
     const { targetTemperature, mode } = state;
 
@@ -13,6 +15,14 @@ export function validateClimateState(state: Partial<ClimateState>): boolean {
         targetTemperature !== undefined && typeof targetTemperature !== 'number' ||
         mode !== undefined && typeof mode !== 'string' && !['heat', 'cool', 'auto'].includes(mode)
     ) {
+        return false;
+    }
+
+    const extraKeys = Object.keys(state).filter(stateKey => !ClimateStateKeys.includes(stateKey as any));
+
+    if(extraKeys.length > 0) {
+        // TODO: Make this throw an error/connect to the response
+        console.error(`Unknown keys present: ${extraKeys.join(', ')}`);
         return false;
     }
 
