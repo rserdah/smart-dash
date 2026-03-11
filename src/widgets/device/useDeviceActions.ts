@@ -14,7 +14,7 @@ export function useDeviceActions(device: any, setState: Dispatch<any>) {
 
     // TODO: Add capabilities to devices table, then here, go through the device capabilities and conditionally add actions based on each capability
     if(capabilities.includes('power')) {
-        actions.togglePower = callbacks.togglePower;
+        actions.setPower = callbacks.setPower;
     }
 
     if(capabilities.includes('targetTemperature')) {

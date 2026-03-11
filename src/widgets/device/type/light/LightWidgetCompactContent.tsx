@@ -22,7 +22,7 @@ export default function LightWidgetCompactContent({ device, state, actions, setE
             addCssGetter={() => css`height: 100%;`}
             header={<div css={css`display: flex; flex-direction: row; justify-content: space-between; gap: 10px;`}>
                 <span css={css`color: white;`}>{device?.name || 'Name N/A'}</span>
-                <ToggleSwitch checked={state.power} onToggle={actions.togglePower} stopPointerDownPropagation />
+                <ToggleSwitch checked={state.power} onToggle={actions.setPower} stopPointerDownPropagation />
             </div>}
             onLongPress={() => setExpanded(true)}
         >
@@ -31,7 +31,7 @@ export default function LightWidgetCompactContent({ device, state, actions, setE
             <ToggleButton
                 name='ToggleButton1'
                 checked={state.power}
-                onChange={actions.togglePower}
+                onChange={actions.setPower}
             />
 
             <InputLinearSlider

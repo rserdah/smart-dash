@@ -10,14 +10,22 @@ export async function fetchDevice(id: number) {
     return res.json();
 }
 
-export async function toggleDevicePower(id: number) {
-    const res = await fetch(`http://localhost:4000/api/devices/${id}/power/`, { method: 'PATCH' });
+export async function setDevicePower(id: number, power: boolean) {
+    const res = await fetch(`http://localhost:4000/api/devices/${id}/state/`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            power: power
+        })
+    });
 
     return res.json();
 }
 
 export async function setDeviceTemperature(id: number, temp: number) {
-    const res = await fetch(`http://localhost:4000/api/devices/${id}/temperature/`, {
+    const res = await fetch(`http://localhost:4000/api/devices/${id}/state/`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
