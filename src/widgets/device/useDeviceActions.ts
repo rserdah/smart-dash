@@ -13,21 +13,16 @@ export function useDeviceActions(device: any, setState: Dispatch<any>) {
     const actions: DeviceActions = {};
 
     // TODO: Add capabilities to devices table, then here, go through the device capabilities and conditionally add actions based on each capability
-    if(capabilities.includes('power')) {
-        actions.setPower = callbacks.setPower;
-    }
-
-    if(capabilities.includes('brightness')) {
-        actions.setBrightness = callbacks.setBrightness;
-    }
-
-    if(capabilities.includes('color')) {
-        actions.setBrightness = callbacks.setColor;
-    }
-
-    if(capabilities.includes('targetTemperature')) {
-        actions.setTemperature = callbacks.setTemperature;
-    }
+    ([
+        ['power', 'setPower'],
+        ['brightness', 'setBrightness'],
+        ['color', 'setColor'],
+        ['targetTemperature', 'setTemperature'],
+    ] as [string, keyof typeof callbacks][]).forEach(([capability, fnName]: [string, keyof typeof callbacks]) => {
+        if(capabilities.includes(capability)) {
+            actions[fnName] = callbacks[fnName];
+        }
+    });
 
     return actions;
 }
