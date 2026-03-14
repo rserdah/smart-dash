@@ -17,6 +17,14 @@ export function useDeviceActions(device: any, setState: Dispatch<any>) {
         actions.setPower = callbacks.setPower;
     }
 
+    if(capabilities.includes('brightness')) {
+        actions.setBrightness = callbacks.setBrightness;
+    }
+
+    if(capabilities.includes('color')) {
+        actions.setBrightness = callbacks.setColor;
+    }
+
     if(capabilities.includes('targetTemperature')) {
         actions.setTemperature = callbacks.setTemperature;
     }

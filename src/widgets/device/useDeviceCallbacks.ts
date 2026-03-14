@@ -1,5 +1,5 @@
 import { useCallback, Dispatch } from 'react';
-import { setDevicePower, setDeviceTemperature } from '@/api/devices';
+import { setDevicePower, setDeviceBrightness, setDeviceColor, setDeviceTemperature } from '@/api/devices';
 
 export type DeviceActions = {
 } | any;
@@ -16,6 +16,28 @@ export function useDeviceCallbacks(device: any, setState: Dispatch<any>) {
 
         if(result && typeof result.state.power === 'boolean') {
             setState((s: any) => ({ ...s, power: result.state.power }));
+        }
+    }, [deviceId, setState]);
+
+    const setBrightness = useCallback(async (brightness: number) => {
+        const result = await setDeviceBrightness(deviceId, brightness);
+
+        // TODO: Parse device state on the backend so it is validated
+        result.state = JSON.parse(result.state);
+
+        if(result && typeof result.state.brightness === 'number') {
+            setState((s: any) => ({ ...s, brightness: result.state.brightness }));
+        }
+    }, [deviceId, setState]);
+
+    const setColor = useCallback(async (color: [number, number, number]) => {
+        const result = await setDeviceColor(deviceId, color);
+
+        // TODO: Parse device state on the backend so it is validated
+        result.state = JSON.parse(result.state);
+
+        if(result && Array.isArray(result.state.color) && result.state.color.length === 3) {
+            setState((s: any) => ({ ...s, color: result.state.color }));
         }
     }, [deviceId, setState]);
 
@@ -36,6 +58,8 @@ export function useDeviceCallbacks(device: any, setState: Dispatch<any>) {
 
     return {
         setPower,
+        setBrightness,
+        setColor,
         setTemperature,
     };
 }
