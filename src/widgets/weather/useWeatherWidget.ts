@@ -8,7 +8,6 @@ export type WeatherState = {
 };
 
 export type WeatherActions = {
-    setBrightness: (value: number) => void;
 };
 
 export function useWeatherWidget() {
@@ -43,17 +42,9 @@ export function useWeatherWidget() {
         }));
     }, []);
 
-    const setBrightness = useCallback((value: number) => {
-        setState(s => ({
-            ...s,
-            brightness: value,
-        }));
-    }, []);
-
     return {
         state,
         actions: {
-            setBrightness,
         },
     };
 }
