@@ -17,7 +17,10 @@ const PortalOverlay = styled.div`
     overscroll-behavior: contain;
 `;
 
-const PortalBox = styled.div``;
+const PortalBox = styled.div`
+    width: 60%;
+    height: 30rem;
+`;
 
 type WidgetPortalProps = {
     expanded: boolean;
