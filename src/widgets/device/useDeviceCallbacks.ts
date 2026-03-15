@@ -1,9 +1,6 @@
 import { useCallback, Dispatch } from 'react';
 import { setDevicePower, setDeviceBrightness, setDeviceColor, setDeviceTemperature } from '@/api/devices';
 
-export type DeviceActions = {
-} | any;
-
 export function useDeviceCallbacks(device: any, setState: Dispatch<any>) {
     const deviceId: number = device.id;
 
