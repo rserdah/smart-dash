@@ -1,10 +1,11 @@
 /** @jsxImportSource @emotion/react */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import { useDrag } from '@/hooks/useDrag';
 
-interface InputLinearSliderProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputLinearSliderProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, | 'onChange'> {
+    onChange?: (value: number) => void;
     range?: [number, number];
     clampRange?: [number, number];
     sliderWidthPx?: number;
@@ -144,9 +145,12 @@ export default function InputLinearSlider(props: InputLinearSliderProps) {
 
     const drag = useDrag({ onDragStart, onDrag, onDragEnd });
 
+    const tempOnChange = useCallback((e: any) => props.onChange?.(parseFloat(e.target.value)), [props.onChange]);
+
     return (
         <InputLinearSliderBox $sliderWidthPx={props.sliderWidthPx ?? 100} onPointerDown={props.stopPointerDownPropagation ? e => e.stopPropagation() : undefined}>
-            <Gutter ref={gutterRef}>
+            <input type='range' value={props.value} onChange={tempOnChange} disabled={props.disabled} />
+            {/* <Gutter ref={gutterRef}>
                 <GutterClip {...drag}>
                     <ProgressBar $pixelWidth={styleValue}>
                         <InputLinearSliderHandle
@@ -157,7 +161,7 @@ export default function InputLinearSlider(props: InputLinearSliderProps) {
                         </InputLinearSliderHandle>
                     </ProgressBar>
                 </GutterClip>
-            </Gutter>
+            </Gutter> */}
         </InputLinearSliderBox>
     )
 }
