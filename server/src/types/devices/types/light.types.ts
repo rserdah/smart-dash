@@ -3,7 +3,7 @@ import { BaseDeviceState, parseBaseDeviceState, validateBaseDeviceState } from "
 
 export interface LightState extends BaseDeviceState {
     brightness?: number;
-    color?: string;
+    color?: [number, number, number];
 }
 
 const LightStateKeys: (keyof LightState)[] = ['power', 'brightness', 'color'];
@@ -11,10 +11,14 @@ const LightStateKeys: (keyof LightState)[] = ['power', 'brightness', 'color'];
 export function validateLightState(state: Partial<LightState>): boolean {
     const { brightness, color } = state;
 
+    let sum;
     if(
         !validateBaseDeviceState(state) ||
         brightness !== undefined && typeof brightness !== 'number' ||
-        color !== undefined && typeof color !== 'string'
+        color !== undefined && (!Array.isArray(color) || color.length !== 3 || (
+            typeof color[0] !== 'number' || typeof color[1] !== 'number' || typeof color[2] !== 'number' ||
+            (sum = color.reduce((s, x) => s + x, 0)) < 0 || sum > 255 * 3
+        ))
     ) {
         return false;
     }
