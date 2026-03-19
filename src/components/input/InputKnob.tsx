@@ -16,6 +16,7 @@ interface InputKnobProps extends Omit<React.InputHTMLAttributes<HTMLInputElement
 
     /** Should propagation of onPointerDown event on the container element be stopped? */
     stopPointerDownPropagation?: boolean;
+    mapOnChange?: boolean;
 }
 
 const InputKnobBox = styled.div`
@@ -57,6 +58,11 @@ function normalizeDelta(delta: number) {
 }
 
 // Modified from ChatGPT
+function wrapDegrees(angle: number) {
+    return ((angle % 360) + 360) % 360;
+}
+
+// Modified from ChatGPT
 function getAngle(cx: number, cy: number, x: number, y: number) {
     return Math.atan2(y - cy, x - cx);
 }
@@ -72,6 +78,21 @@ function snap(v: number, step?: number) {
     return Math.round(v / step) * step;
 }
 
+// Modified from ChatGPT
+function mapRange(
+    value: number,
+    inMin: number,
+    inMax: number,
+    outMin: number = 0,
+    outMax: number = 1
+) {
+    // Normalize first (makes it from 0 to 1)
+    const normalized = (value - inMin) / (inMax - inMin);
+
+    // Then just multiply by the output range (adding the min so it doesn't go below the min)
+    return outMin + normalized * (outMax - outMin);
+}
+
 export default function InputKnob(props: InputKnobProps) {
     const controlled = props.value != undefined;
     // Internal value and state setter (only used if not controlled)
@@ -80,13 +101,16 @@ export default function InputKnob(props: InputKnobProps) {
 
     const startAngleRef = useRef(0);
     const startValueRef = useRef(0);
+    const prevAngleRef = useRef(0);
 
     const handleRef = useRef<HTMLDivElement | null>(null);
 
     const onChange = (value: typeof _value) => {
         if(!controlled) _setValue(value);
 
-        props.onChange?.(value);
+        const onChangeValue = props.mapOnChange && props.min != undefined && props.max != undefined ? mapRange(value, props.min, props.max, 0, 100) : value;
+
+        props.onChange?.(onChangeValue);
     };
 
     // Modified from ChatGPT
@@ -104,6 +128,7 @@ export default function InputKnob(props: InputKnobProps) {
         const cy = rect.top + rect.height / 2;
 
         startAngleRef.current = getAngle(cx, cy, e.clientX, e.clientY);
+        prevAngleRef.current = startAngleRef.current;
         startValueRef.current = value;
     }, [value]);
 
@@ -120,13 +145,48 @@ export default function InputKnob(props: InputKnobProps) {
 
         const currentAngle = getAngle(cx, cy, e.clientX, e.clientY);
         let delta = currentAngle - startAngleRef.current;
-        delta = normalizeDelta(delta);
+
+        const frameDelta = currentAngle - prevAngleRef.current;
+
+        let degreeAdd = 0;
+
+        if(frameDelta > Math.PI) {
+            console.log('frameDelta > Math.PI');
+            delta -= Math.PI * 2;
+            degreeAdd = 360;
+
+        }
+        else if(frameDelta < -Math.PI) {
+            console.log('frameDelta < -Math.PI');
+            delta += Math.PI * 2;
+            degreeAdd = -360;
+
+        }
+        
+        prevAngleRef.current = currentAngle;
 
         let degrees = delta * (180 / Math.PI);
 
         degrees = startValueRef.current + degrees;
+
+        // THIS PARTIALLY FIXES THE ISSUE, BUT WHEN LOOPING AROUND MULTIPLE TIMES IT STOPS WORKING
+        // MIGHT BE ABLE TO FIX IF LIMIT THE KNOB FROM LOOPING ROTATION
+        // MIGHT BE ABLE TO FIX IF LIMIT THE KNOB FROM LOOPING ROTATION
+        // MIGHT BE ABLE TO FIX IF LIMIT THE KNOB FROM LOOPING ROTATION
+        // MIGHT BE ABLE TO FIX IF LIMIT THE KNOB FROM LOOPING ROTATION
+        // MIGHT BE ABLE TO FIX IF LIMIT THE KNOB FROM LOOPING ROTATION
+        // MIGHT BE ABLE TO FIX IF LIMIT THE KNOB FROM LOOPING ROTATION
+        // MIGHT BE ABLE TO FIX IF LIMIT THE KNOB FROM LOOPING ROTATION
+        // MIGHT BE ABLE TO FIX IF LIMIT THE KNOB FROM LOOPING ROTATION
+        // degrees += degreeAdd;
         
-        degrees = snap(clamp(degrees, -90, 90), props.step);
+        if(props.min !== undefined && props.max !== undefined) {
+            // degrees = clamp(degrees, props.min, props.max);
+        }
+
+        if(props.step !== undefined) {
+            degrees = snap(degrees, props.step);
+        }
 
         onChange(degrees);
     }, [_value]); // ?????
