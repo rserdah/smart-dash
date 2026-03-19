@@ -7,6 +7,7 @@ import Widget from '@/components/Widget';
 import ToggleSwitch from "@/components/input/ToggleSwitch";
 import InputLinearSlider from '@/components/input/InputLinearSlider';
 import { useDebouncedState } from '../../useDebouncedState';
+import InputKnob from '@/components/input/InputKnob';
 
 type Props = {
     state: any; // DeviceState;
@@ -76,7 +77,7 @@ export default function LightWidgetCompactContent({ device, state, actions, setE
 
     return (
         <Widget
-            addCssGetter={() => css`height: 100%; ${state.power ? `background: ${_color ? `color-mix(in srgb, ${rgbToHex(_color, true)} ${_brightness}%, #000)` : 'transparent'}` : ''}`}
+            addCssGetter={() => css`height: 100%;`}
             header={<div css={css`display: flex; flex-direction: row; justify-content: space-between; gap: 10px;`}>
                 <span css={css`color: white;`}>{device?.name || 'Name N/A'}</span>
                 <ToggleSwitch checked={state.power} onToggle={actions.setPower} stopPointerDownPropagation />
@@ -85,11 +86,23 @@ export default function LightWidgetCompactContent({ device, state, actions, setE
         >
             { device.capabilities.includes('brightness') && <span>{state.power ? _brightness : 0}%</span> }
 
-            <ToggleButton
-                name='ToggleButton1'
-                checked={state.power}
-                onChange={actions.setPower}
-            />
+            <div css={css`display: flex; flex-direction: row;`}>
+                <div css={css`display: flex; flex-direction: row; flex-basis: 33%;`}>
+                    <ToggleButton
+                        name='ToggleButton1'
+                        checked={state.power}
+                        onChange={actions.setPower}
+                    />
+                </div>
+
+                <div css={css`display: flex; flex-direction: row; flex-basis: 33%;`}>
+                    { device.capabilities.includes('brightness') && <InputKnob name='' /* onChange={console.log} */ value={(_brightness / 100) * (160 - -160) + -160} min={-160} max={160} onChange={_setBrightness} mapOnChange stopPointerDownPropagation /> }
+                </div>
+
+                <div css={css`display: flex; flex-direction: row; justify-content: flex-end; flex-basis: 33%;`}>
+                    { device.capabilities.includes('color') && <input type='color' value={hexColor} onChange={onColorChange} /> }
+                </div>
+            </div>
 
             { device.capabilities.includes('brightness') && <InputLinearSlider
                 value={_brightness}
@@ -97,8 +110,6 @@ export default function LightWidgetCompactContent({ device, state, actions, setE
                 // disabled={!state.power}
                 stopPointerDownPropagation
             /> }
-
-            { device.capabilities.includes('color') && <input type='color' value={hexColor} onChange={onColorChange} /> }
         </Widget>
     )
 }
