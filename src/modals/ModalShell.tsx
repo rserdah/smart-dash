@@ -52,7 +52,7 @@ export const ModalHeader = styled.div`
     align-items: center;
     justify-content: space-between;
 
-    font-size: 1.1rem;
+    font-size: 1.76rem;
     font-weight: 600;
 `;
 

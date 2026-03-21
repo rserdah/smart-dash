@@ -27,8 +27,8 @@ const Box = styled.div`
     flex: 1;
     gap: 16px;
     padding: 20px;
-    width: 40rem;
-    height: 25rem;
+    width: 64rem;
+    height: 40rem;
     /* min-height: 0px; */
     max-height: 90vh;
     border: 1px solid white;
@@ -48,7 +48,7 @@ const Header = styled.div`
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    font-size: 1.1rem;
+    font-size: 1.76rem;
     font-weight: 600;
     color: white;
 `;

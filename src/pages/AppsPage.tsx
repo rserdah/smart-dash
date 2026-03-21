@@ -63,91 +63,91 @@ export default function AppsPage() {
                     <div css={css`display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; outline: 1px solid red;`}>
                         <AppItemBox>
                             <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
                         </AppItemBox>
                         <AppItemBox>
                             <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
                         </AppItemBox>
                         <AppItemBox>
                             <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
                         </AppItemBox>
                         <AppItemBox>
                             <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
                         </AppItemBox>
                         <AppItemBox>
                             <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
                         </AppItemBox>
                         <AppItemBox>
                             <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
                         </AppItemBox>
                         <AppItemBox>
                             <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
-                        </AppItemBox>
-                        
-                        
-                        <AppItemBox>
-                            <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
-                        </AppItemBox>
-                        <AppItemBox>
-                            <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
-                        </AppItemBox>
-                        <AppItemBox>
-                            <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
-                        </AppItemBox>
-                        <AppItemBox>
-                            <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
-                        </AppItemBox>
-                        <AppItemBox>
-                            <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
-                        </AppItemBox>
-                        <AppItemBox>
-                            <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
-                        </AppItemBox>
-                        <AppItemBox>
-                            <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
                         </AppItemBox>
                         
                         
                         <AppItemBox>
                             <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
                         </AppItemBox>
                         <AppItemBox>
                             <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
                         </AppItemBox>
                         <AppItemBox>
                             <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
                         </AppItemBox>
                         <AppItemBox>
                             <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
                         </AppItemBox>
                         <AppItemBox>
                             <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
                         </AppItemBox>
                         <AppItemBox>
                             <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
                         </AppItemBox>
                         <AppItemBox>
                             <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
-                            <span css={css`font-size: 0.75rem; color: white;`}>App Name</span>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
+                        </AppItemBox>
+                        
+                        
+                        <AppItemBox>
+                            <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
+                        </AppItemBox>
+                        <AppItemBox>
+                            <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
+                        </AppItemBox>
+                        <AppItemBox>
+                            <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
+                        </AppItemBox>
+                        <AppItemBox>
+                            <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
+                        </AppItemBox>
+                        <AppItemBox>
+                            <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
+                        </AppItemBox>
+                        <AppItemBox>
+                            <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
+                        </AppItemBox>
+                        <AppItemBox>
+                            <div css={css`min-width: 35px; max-width: 35px; min-height: 35px; max-height: 35px; border-radius: 8px; background: green;`}></div>
+                            <span css={css`font-size: 1.2rem; color: white;`}>App Name</span>
                         </AppItemBox>
                         
                         

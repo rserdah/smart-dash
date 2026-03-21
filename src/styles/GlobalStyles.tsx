@@ -2,7 +2,7 @@ import { Global, css } from '@emotion/react';
 
 const styles = css`
     html {
-        font-size: 16px;
+        font-size: 10px;
     }
 
     body {

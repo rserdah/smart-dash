@@ -19,7 +19,7 @@ const PortalOverlay = styled.div`
 
 const PortalBox = styled.div`
     width: 60%;
-    height: 30rem;
+    height: 48rem;
 `;
 
 type WidgetPortalProps = {

@@ -343,8 +343,8 @@ export default function WeatherWidgetCompact({ state, actions, setExpanded, expa
             header={<>
                 <div css={css`display: flex; flex-direction: column; color: white;`}>
                     <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
-                        <MaterialIcon icon='partly_cloudy_day' wght={300} addCssGetter={() => css`font-size: 2.5rem; color: yellow;`} />
-                        <span css={css`font-size: 1.5rem;`}>{`${temperature}°${temperatureUnit}`}</span>
+                        <MaterialIcon icon='partly_cloudy_day' wght={300} addCssGetter={() => css`font-size: 4rem; color: yellow;`} />
+                        <span css={css`font-size: 2.4rem;`}>{`${temperature}°${temperatureUnit}`}</span>
                     </div>
 
                     <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
@@ -359,7 +359,7 @@ export default function WeatherWidgetCompact({ state, actions, setExpanded, expa
             <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-top: auto; width: 100%; font-weight: 200;`}>
                 {
                     weatherData?.forecastPeriods && weekForecast.map((x: any, i) => (
-                        <div css={css`display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; width: 2rem; border-radius: 5px; background: ${new Date().getDay() == i ? '#ffffff48' : 'transparent'};`}>
+                        <div css={css`display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; width: 3.2rem; border-radius: 5px; background: ${new Date().getDay() == i ? '#ffffff48' : 'transparent'};`}>
                             <span css={css`color: #ffffff8e;`}>{x ? (x.name+'').charAt(0) : '--'}</span>
                             <span>{x ? `${x.temperature}°` : 'ERR'}</span>
                         </div>

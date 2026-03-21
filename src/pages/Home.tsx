@@ -31,7 +31,7 @@ const Box = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2rem;
+    gap: 3.2rem;
     width: 100vw;
     height: 100vh;
     font-weight: 500;
@@ -264,7 +264,7 @@ export default function Home() {
                                         <div css={css`box-sizing: border-box; display: flex; padding: 10px; padding-top: 0px; flex: 1; width: 100%; max-width: 100%; min-height: 0px; align-items: flex-end;`}>
                                             <div css={css`display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; height: 100%;`}>
                                                 <span css={css`display: flex; flex-direction: row; width: 100%; color: white;`}>Desk Lamp</span>
-                                                <InputLinearSlider name='' sliderWidthPx={150} handleOverlayJsx={<div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}><MaterialIcon icon='lightbulb_2' wght={300} addCssGetter={() => css`font-size: 1rem; color: var(--primary-color);`} /></div>} stopPointerDownPropagation />
+                                                <InputLinearSlider name='' sliderWidthPx={150} handleOverlayJsx={<div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}><MaterialIcon icon='lightbulb_2' wght={300} addCssGetter={() => css`font-size: 1.6rem; color: var(--primary-color);`} /></div>} stopPointerDownPropagation />
                                             </div>
 
                                             <div css={css`position: relative; top: 5px; width: 110px; height: 140px; overflow: hidden;`}>
@@ -281,7 +281,7 @@ export default function Home() {
                                         <div css={css`box-sizing: border-box; display: flex; padding: 10px; padding-top: 0px; flex: 1; width: 100%; max-width: 100%; min-height: 0px; align-items: flex-end;`}>
                                             <div css={css`display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; height: 100%;`}>
                                                 <span css={css`display: flex; flex-direction: row; width: 100%; color: white;`}>Desk Lamp</span>
-                                                <InputLinearSlider name='' sliderWidthPx={150} handleOverlayJsx={<div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}><MaterialIcon icon='lightbulb_2' wght={300} addCssGetter={() => css`font-size: 1rem; color: var(--primary-color);`} /></div>} stopPointerDownPropagation />
+                                                <InputLinearSlider name='' sliderWidthPx={150} handleOverlayJsx={<div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}><MaterialIcon icon='lightbulb_2' wght={300} addCssGetter={() => css`font-size: 1.6rem; color: var(--primary-color);`} /></div>} stopPointerDownPropagation />
                                             </div>
 
                                             <div css={css`position: relative; top: 5px; width: 110px; height: 140px; overflow: hidden;`}>
