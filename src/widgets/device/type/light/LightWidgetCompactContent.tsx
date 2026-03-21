@@ -29,6 +29,16 @@ function rgbToHex(rgb: [number, number, number], withHash: boolean = false) {
     return rgb.reduce((c: string, x: number) => c + x.toString(16).padStart(2, '0'), withHash ? '#' : '');
 }
 
+const FadeIn = styled.div<{ $delay?: number, $dur?: number }>`
+    opacity: 1;
+
+    transition: opacity ${p => p.$dur ?? 1}s ${p => p.$delay ?? 0}s ease;
+
+    @starting-style {
+        opacity: 0;
+    }
+`;
+
 export default function LightWidgetCompactContent({ device, state, actions, setExpanded, expanded }: Props) {
     // const [_brightness, _setBrightness] = useState(state.brightness);
 
@@ -104,12 +114,26 @@ export default function LightWidgetCompactContent({ device, state, actions, setE
                 </div>
             </div>
 
-            { device.capabilities.includes('brightness') && <InputLinearSlider
+            { expanded && device.capabilities.includes('brightness') && <FadeIn $dur={2} $delay={0 / 10}><InputLinearSlider
                 value={_brightness}
                 onChange={_setBrightness}
                 // disabled={!state.power}
                 stopPointerDownPropagation
-            /> }
+            /></FadeIn> }
+
+            { expanded && device.capabilities.includes('brightness') && <FadeIn $dur={2} $delay={1 / 10}><InputLinearSlider
+                value={_brightness}
+                onChange={_setBrightness}
+                // disabled={!state.power}
+                stopPointerDownPropagation
+            /></FadeIn> }
+
+            { expanded && device.capabilities.includes('brightness') && <FadeIn $dur={2} $delay={2 / 10}><InputLinearSlider
+                value={_brightness}
+                onChange={_setBrightness}
+                // disabled={!state.power}
+                stopPointerDownPropagation
+            /></FadeIn> }
         </Widget>
     )
 }
