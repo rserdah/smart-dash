@@ -3,21 +3,18 @@ import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import Widget from '@/components/Widget';
 import InputKnob from '../components/input/InputKnob';
-import ToggleSwitch from '../components/input/ToggleSwitch';
 import InputText from '../components/input/InputText';
 import ToggleButtonGroup from '../components/input/ToggleButtonGroup';
 import InputLinearSlider from '../components/input/InputLinearSlider';
 import InputCheckbox from '../components/input/InputCheckbox';
 import ToggleButton from '../components/input/ToggleButton';
 import { useModal } from '@/modals/ModalContext';
-import { ModalProps, ModalBody, ModalFooter, ModalFooterBtn } from '@/modals/ModalShell';
 import { useEffect, useState } from 'react';
 import MaterialIcon from '@/components/MaterialIcon';
 import { WeatherWidget } from '@/widgets/weather/WeatherWidget';
 import { DeviceWidget } from '@/widgets/device/DeviceWidget';
 import WidgetController from '@/widgets/WidgetController';
 import ExpandedWidget from '@/widgets/ExpandedWidget';
-import { fetchDevices } from '@/api/devices';
 
 // IMPORTANT! styled.element variables CANNOT be defined inside the functional component or else they will unmount every time the functional component re-renders
 const ImgBackground = styled.img`
@@ -125,11 +122,33 @@ const rooms: RoomData[] = [
     }, 
 ];
 
+const renderWidget = (widget: any) => {
+    switch(widget.type) {
+        case 'weather':
+            return <WeatherWidget grid={{ col: widget.col, row: widget.row, colSpan: widget.colSpan, rowSpan: widget.rowSpan }} />
+
+        case 'device':
+            return <DeviceWidget id={widget.deviceId} device={widget.device} grid={{ col: widget.col, row: widget.row, colSpan: widget.colSpan, rowSpan: widget.rowSpan }} />
+
+        default:
+            return <WidgetController
+                compactRender={props => <Widget addCssGetter={() => css`height: 100%;`} title={widget.title} onLongPress={() => props.setExpanded(true)} />}
+                expandedRender={props => <ExpandedWidget title={widget.title} state={{}} actions={{}} />}
+            />
+    }
+};
+
+const renderWidgets = (widgets: any[]) => {
+    return widgets.map((x: any, i: number) => (
+        <WidgetSlot key={`${x.title}_${x.col}_${x.row}_${x.colSpan}_${x.rowSpan}_${i}`} $col={x.col} $row={x.row} $colSpan={x.colSpan} $rowSpan={x.rowSpan}>
+            {renderWidget(x)}
+        </WidgetSlot>
+    ))
+};
+
 export default function Home() {
     const [roomId, setRoomId] = useState('living_room');
     const [widgets, setWidgets] = useState([]);
-    const [checked, setChecked] = useState(false);
-    const modal = useModal();
 
     useEffect(() => {
         fetch('http://localhost:4000/api/widgets')
@@ -151,14 +170,7 @@ export default function Home() {
 
                 <MainContentBox>
                     <DashboardGrid>
-                        {
-                            widgets.map((x: any, i: number) => (
-                                <WidgetSlot key={`${x.name}_${x.col}_${x.row}_${x.colSpan}_${x.rowSpan}_${i}`} $col={x.col} $row={x.row} $colSpan={x.colSpan} $rowSpan={x.rowSpan}>
-                                    { x.type == 'weather' && <WeatherWidget grid={{col: x.col, row: x.row, colSpan: x.colSpan, rowSpan: x.rowSpan}} /> }
-                                    { x.type == 'device' && <DeviceWidget id={x.deviceId} device={x.device} grid={{col: x.col, row: x.row, colSpan: x.colSpan, rowSpan: x.rowSpan}} /> }
-                                </WidgetSlot>
-                            ))
-                        }
+                        {renderWidgets(widgets)}
                     </DashboardGrid>
 
                     {/* <DashboardGrid>
@@ -306,23 +318,23 @@ export default function Home() {
                                     <Widget addCssGetter={() => css`height: 100%;`} onLongPress={() => props.setExpanded(true)} custom>
                                         <ImgBackground src={currentRoom?.img} css={css`top: 0px; left: -45px; width: unset; height: 100%; transform: scale(1.25);`} />
 
-                                        <div css={css`display: flex; gap: 5px;`}>
-                                            <div css={css`display: flex; gap: 8px; align-items: center; justify-content: center; padding: 2px 10px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                        <div css={css`display: flex; gap: 5px; overflow: auto; scrollbar-width: none;`}>
+                                            <div onClick={() => props.setExpanded(true)} css={css`display: flex; gap: 8px; align-items: center; justify-content: center; padding: 2px 10px; width: max-content; height: 2rem; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
                                                 <div css={css`width: 5px; height: 5px; border-radius: 999px; background: #e92323ff; box-shadow: 0px 0px 4px 2px #e92323ff;`}></div>
                                                 <span css={css`font-size: 14px;`}>Live</span>
                                             </div>
 
-                                            <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                            <div onClick={() => props.setExpanded(true)} css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: 2rem; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
                                                 <MaterialIcon icon='bolt' addCssGetter={() => css`font-size: 20px;`} />
                                                 <span css={css`font-size: 14px;`}>65W</span>
                                             </div>
 
-                                            <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                            <div onClick={() => props.setExpanded(true)} css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: 2rem; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
                                                 <MaterialIcon icon='lightbulb_2' addCssGetter={() => css`font-size: 20px;`} />
                                                 <span css={css`font-size: 14px;`}>60%</span>
                                             </div>
 
-                                            <div css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
+                                            <div onClick={() => props.setExpanded(true)} css={css`display: flex; gap: 0px; align-items: center; justify-content: center; padding: 2px 10px; padding-left: 5px; width: max-content; height: 2rem; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
                                                 <MaterialIcon icon='thermometer' addCssGetter={() => css`font-size: 20px;`} />
                                                 <span css={css`font-size: 14px;`}>78°F</span>
                                             </div>
@@ -333,7 +345,7 @@ export default function Home() {
                                     <ExpandedWidget state={{}} actions={{}}>
                                         <ImgBackground src={currentRoom?.img} css={css`top: 0px; left: -45px; width: unset; height: 100%; transform: scale(1.25);`} />
 
-                                        <div css={css`display: flex; gap: 5px;`}>
+                                        <div css={css`display: flex; gap: 5px; overflow: auto; scrollbar-width: none;`}>
                                             <div css={css`display: flex; gap: 8px; align-items: center; justify-content: center; padding: 2px 10px; width: max-content; height: max-content; border: 1px solid #ffffff49; border-radius: 999px; color: white; background: #69696910; backdrop-filter: blur(10px) saturate(0.9);`}>
                                                 <div css={css`width: 5px; height: 5px; border-radius: 999px; background: #e92323ff; box-shadow: 0px 0px 4px 2px #e92323ff;`}></div>
                                                 <span css={css`font-size: 14px;`}>Live</span>
