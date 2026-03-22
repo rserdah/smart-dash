@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import AppsPage from './pages/AppsPage';
 import Settings from './pages/Settings';
 import Sidebar from './components/Sidebar';
+import DevicesPage from './pages/DevicesPage/DevicesPage';
 
 interface AppProps extends PropsWithChildren {
 }
@@ -45,6 +46,7 @@ export default function App(props: AppProps) {
                 <Routes>
                     <Route path='/' element={<Home />} />
                     <Route path='/apps' element={<AppsPage />} />
+                    <Route path='/devices' element={<DevicesPage />} />
                     <Route path='/settings' element={<Settings />} />
                 </Routes>
 
