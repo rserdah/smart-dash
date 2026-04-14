@@ -15,6 +15,10 @@ const styles = css`
         user-select: none;
     }
 
+    h1, h2, h3, h4, h5, h6 {
+        font-family: "Nunito", sans-serif;
+    }
+
     div,
     button,
     input,

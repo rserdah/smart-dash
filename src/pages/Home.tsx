@@ -21,6 +21,14 @@ const ImgBackground = styled.img`
     position: absolute;
     height: 100%;
     z-index: -1;
+    opacity: 1;
+
+    transition: opacity 2s ease;
+
+    /* Use this to make room backgrounds fade in (but fade out is instant currently) */
+    /* @starting-style {
+        opacity: 0;
+    } */
 `;
 
 const Box = styled.div`
@@ -34,15 +42,44 @@ const Box = styled.div`
     font-weight: 500;
     /* background: radial-gradient(hsl(from var(--primary-color) h calc(s * 0.5) calc(l * 0.25)), var(--background-color)); */
     transition: background-color 0.25s ease;
+
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 48rem auto;
+    gap: 10px;
+    padding: 3rem 0px;
+`;
+
+const SearchBox = styled.div`
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-self: start;
+    flex: 1;
+    gap: 10px;
+    padding: 10px;
+    width: 100%;
+    height: 4rem;
+    min-height: 0px;
+    border: 1px solid white;
+    border-radius: 99999px;
+    /* background: var(--container-background-color); */
+    background: #69696910;
+    color: var(--text-color-inverted);
+    backdrop-filter: blur(10px) saturate(0.9);
+    overflow: hidden;
 `;
 
 const MainContentBox = styled.div`
     box-sizing: border-box;
     display: flex;
     gap: 10px;
-    padding: 10px;
+    /* padding: 10px; */
     width: 100%;
-    height: 70%;
+    height: 100%;
     min-height: 0px;
     border-radius: 10px;
     /* background: #ffffff41; */
@@ -71,9 +108,12 @@ const RoomSelectorBox = styled.div`
     flex-direction: row;
     align-items: center;
     justify-content: center;
+    align-self: end;
+    justify-self: center;
     gap: 5px;
     padding: 5px;
     margin: 0px;
+    width: max-content;
     height: max-content;
     max-height: max-content;
     border: 1px solid white;
@@ -98,29 +138,12 @@ const RoomSelectorBtn = styled.button<{ $active?: boolean }>`
     }
 `;
 
-type RoomData = {
-    id: string;
-    name: string;
-    img: string;
+/** Temp.; for mapping rooms to images before the images are stored in DB */
+const _roomImgs = {
+    living_room: 'src/img/LivingRoomImage_Vecislavas_Popa_Pexels.jpg',
+    dining_room: 'src/img/DiningRoomImage_Jean_van_der_Meulen_Pexels.jpg',
+    bedroom: 'src/img/BedroomImage_Jean_van_der_Meulen_Pexels.jpg',
 };
-
-const rooms: RoomData[] = [
-    {
-        id: 'living_room', 
-        name: 'Living Room', 
-        img: 'src/img/LivingRoomImage_Vecislavas_Popa_Pexels.jpg', 
-    }, 
-    {
-        id: 'dining_room', 
-        name: 'Dining Room', 
-        img: 'src/img/DiningRoomImage_Jean_van_der_Meulen_Pexels.jpg', 
-    }, 
-    {
-        id: 'bedroom', 
-        name: 'Bedroom', 
-        img: 'src/img/BedroomImage_Jean_van_der_Meulen_Pexels.jpg', 
-    }, 
-];
 
 const renderWidget = (widget: any) => {
     switch(widget.type) {
@@ -138,39 +161,59 @@ const renderWidget = (widget: any) => {
     }
 };
 
-const renderWidgets = (widgets: any[]) => {
-    return widgets.map((x: any, i: number) => (
-        <WidgetSlot key={`${x.title}_${x.col}_${x.row}_${x.colSpan}_${x.rowSpan}_${i}`} $col={x.col} $row={x.row} $colSpan={x.colSpan} $rowSpan={x.rowSpan}>
-            {renderWidget(x)}
+const renderRoomDashboard = (room: any) => {
+    const dashboardWidgets: any[] = room?.dashboard?.widgets || [];
+
+    return dashboardWidgets.map((x: any, i: number) => {
+        const { id, col, row, colSpan, rowSpan, widget } = x;
+
+        return <WidgetSlot key={`${widget.title}_${col}_${row}_${colSpan}_${rowSpan}_${id}_${i}`} $col={col} $row={row} $colSpan={colSpan} $rowSpan={rowSpan}>
+            {renderWidget(widget)}
         </WidgetSlot>
-    ))
+    })
 };
 
 export default function Home() {
-    const [roomId, setRoomId] = useState('living_room');
+    const [roomId, setRoomId] = useState(1 /* 'living_room' */);
     const [widgets, setWidgets] = useState([]);
+    const [rooms, setRooms] = useState([] as any[]);
+    const [currentRoom, setCurrentRoom] = useState(null as any);
 
     useEffect(() => {
-        fetch('http://localhost:4000/api/widgets')
+        fetch('http://localhost:4000/api/rooms')
             .then(res => res.json())
-            .then(json => { setWidgets(json); return json; })
+            .then(json => { setRooms(json); return json; })
             .catch(e => console.error(e))
     }, []);
 
-    const currentRoom = rooms.find(x => x.id == roomId);
+    useEffect(() => {
+        fetch(`http://localhost:4000/api/rooms/${roomId}/layout`)
+            .then(res => res.json())
+            .then(json => { setCurrentRoom(json); return json; })
+            .catch(e => console.error(e))
+    }, [roomId]);
+
+    // const currentRoom: any = rooms.find((x: any) => x.id == roomId);
 
     return (
         <>
-            <div css={css`position: absolute; z-index: -1; min-width: 100vw; max-width: 100vw; min-height: 100vh; max-height: 100vh; overflow: hidden;`}>
-                <ImgBackground src={currentRoom?.img} />
+            <div css={css`position: absolute; z-index: -1; min-width: 100vw; max-width: 100vw; min-height: 100vh; max-height: 100vh; background: gray; overflow: hidden;`}>
+                {/* Use key to allow image to have a CSS transition (need to uncomment the @starting-style in this element first) */}
+                <ImgBackground key={`${currentRoom?.roomKey}_${currentRoom?.id}`} src={currentRoom?.img || _roomImgs[currentRoom?.roomKey as keyof typeof _roomImgs] || ''} />
             </div>
 
             <Box>
                 {/* <Keyboard /> */}
 
+                <SearchBox>
+                    <MaterialIcon icon='search' />
+
+                    <span>Search</span>
+                </SearchBox>
+
                 <MainContentBox>
                     <DashboardGrid>
-                        {renderWidgets(widgets)}
+                        {renderRoomDashboard(currentRoom)}
                     </DashboardGrid>
 
                     {/* <DashboardGrid>
@@ -374,15 +417,10 @@ export default function Home() {
                 </MainContentBox>
 
                 <RoomSelectorBox>
-                    {/* <ToggleButtonGroup name='togglebuttongroup1' options={[{ label: 'Home', value: 'home' }, { label: 'Lighting', value: 'lighting' }, { label: 'Settings', value: 'settings' }, ]} /> */}
+                    { rooms.map((x, i) => (
+                        <RoomSelectorBtn key={`${x.name}_${x.id}_${i}`} onClick={e => setRoomId(r => x.id)} $active={x.id == currentRoom?.id}>{x.name}</RoomSelectorBtn>
+                    )) }
                     
-                    {
-                        rooms.map((x, i) => (
-                            <RoomSelectorBtn key={`${x.name}_${x.id}_${i}`} onClick={e => setRoomId(r => x.id)} $active={x.id == currentRoom?.id}>{x.name}</RoomSelectorBtn>
-                        ))
-                    }
-                    
-                    <RoomSelectorBtn>Porch</RoomSelectorBtn>
                     <RoomSelectorBtn className='material-symbols-outlined' css={css`--sidebar-link-size: 32px; display: inline-flex; align-items: center; justify-content: center; padding: 2px; min-width: var(--sidebar-link-size); width: var(--sidebar-link-size); max-width: var(--sidebar-link-size); min-height: var(--sidebar-link-size); height: var(--sidebar-link-size); max-height: var(--sidebar-link-size); font-size: 28px; border-radius: 999px; background: transparent; color: white; &:hover { background: #ffffff2f; }`}>add</RoomSelectorBtn>
                 </RoomSelectorBox>
             </Box>

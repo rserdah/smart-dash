@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 // Modified from ChatGPT
-import { MouseEventHandler, PropsWithChildren } from 'react';
+import { ButtonHTMLAttributes, forwardRef, MouseEventHandler, PropsWithChildren } from 'react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
@@ -68,12 +68,25 @@ export const ModalFooter = styled.div`
     gap: 12px;
 `;
 
-export const ModalFooterBtn = styled.button`
+interface ModalFooterBtnProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+    variant?: 'primary' | 'secondary' | 'danger';
+};
+
+const ModalFooterBtnElem = styled.button<ModalFooterBtnProps>`
     flex: 1;
     padding: 5px 10px;
     border: none;
     border-radius: 8px;
 `;
+
+export const ModalFooterBtn = forwardRef<HTMLButtonElement, ModalFooterBtnProps>(({ children, variant='primary', ...rest }, ref) => {
+    return <ModalFooterBtnElem
+        ref={ref}
+        {...rest}
+    >
+        {children}
+    </ModalFooterBtnElem>
+});
 
 type ModalBaseProps = {
     /** String title for the modal. Not used if header has a value. Ignored if custom is true. */
@@ -99,7 +112,11 @@ type ModalChildJsxProps = {
     close: () => void, 
 }
 
-export function ModalShell({ title, header, children, onClose, custom, simpleOk }: ModalProps) {
+export function ModalShell({ title, header, children, onClose, custom, simpleOk, open }: ModalProps) {
+    if(!open) {
+        return null;
+    }
+
     return (
         <ModalOverlay onClick={onClose}>
             <ModalContainer onClick={e => e.stopPropagation()}>

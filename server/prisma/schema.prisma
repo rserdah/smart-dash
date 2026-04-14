@@ -7,16 +7,41 @@ datasource db {
     url      = "file:./dev.db"
 }
 
-model Widget {
+model Room {
     id                              Int                             @id @default(autoincrement())
-    type                            String
-    title                           String
+    roomKey                         String                          @unique
+    name                            String
+    dashboardId                     Int?                            @unique
+    dashboard                       Dashboard?                      @relation(fields: [dashboardId], references: [id])
+    devices                         Device[]
+}
+
+model Dashboard {
+    id                              Int                             @id @default(autoincrement())
+    room                            Room?
+    widgets                         DashboardWidget[]
+}
+
+model DashboardWidget {
+    id                              Int                             @id @default(autoincrement())
+    dashboardId                     Int
+    dashboard                       Dashboard                       @relation(fields: [dashboardId], references: [id])
+    widgetId                        Int
+    widget                          Widget                          @relation(fields: [widgetId], references: [id])
     col                             Int
     row                             Int
     colSpan                         Int
     rowSpan                         Int
+}
+
+model Widget {
+    id                              Int                             @id @default(autoincrement())
+    type                            String
+    title                           String
     deviceId                        Int?
     device                          Device?                         @relation(fields: [deviceId], references: [id])
+
+    dashboardWidgets                DashboardWidget[]
 }
 
 enum DeviceProvider {
@@ -35,5 +60,7 @@ model Device {
     state                           String
     createdAt                       DateTime                        @default(now())
 
+    roomId                          Int?
+    room                            Room?                           @relation(fields: [roomId], references: [id])
     widgets                         Widget[]
 }

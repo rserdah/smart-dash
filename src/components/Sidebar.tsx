@@ -55,6 +55,7 @@ export default function Sidebar(props: SidebarProps) {
                 <NavLink to='/'><MaterialIcon icon='search' addCssGetter={iconStyleGetter} /></NavLink>
                 <NavLink to='/'><MaterialIcon icon='home' addCssGetter={iconStyleGetter} /></NavLink>
                 <NavLink to='/apps'><MaterialIcon icon='apps' addCssGetter={iconStyleGetter} /></NavLink>
+                <NavLink to='/rooms'><MaterialIcon icon='room_preferences' addCssGetter={iconStyleGetter} /></NavLink>
                 <NavLink to='/devices'><MaterialIcon icon='devices' addCssGetter={iconStyleGetter} /></NavLink>
                 <NavLink to='/settings'><MaterialIcon icon='settings' addCssGetter={iconStyleGetter} /></NavLink>
             </SidebarBox>

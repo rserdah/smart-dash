@@ -8,6 +8,8 @@ import AppsPage from './pages/AppsPage';
 import Settings from './pages/Settings';
 import Sidebar from './components/Sidebar';
 import DevicesPage from './pages/DevicesPage/DevicesPage';
+import RoomsPage from './pages/Rooms/RoomsPage';
+import RoomPage from './pages/Rooms/RoomPage';
 
 interface AppProps extends PropsWithChildren {
 }
@@ -46,6 +48,8 @@ export default function App(props: AppProps) {
                 <Routes>
                     <Route path='/' element={<Home />} />
                     <Route path='/apps' element={<AppsPage />} />
+                    <Route path='/rooms' element={<RoomsPage />} />
+                    <Route path='/rooms/:id' element={<RoomPage />} />
                     <Route path='/devices' element={<DevicesPage />} />
                     <Route path='/settings' element={<Settings />} />
                 </Routes>

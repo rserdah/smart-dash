@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
 import cors from 'cors';
+import roomRouter from './routes/rooms/rooms';
 import widgetRouter from './routes/widgets';
 import deviceRouter from './routes/devices/devices';
 import { DeviceErrorCode, deviceErrorHttpMap } from './services/deviceServices';
@@ -33,6 +34,7 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' });
 });
 
+app.use('/api/rooms', roomRouter);
 app.use('/api/widgets', widgetRouter);
 app.use('/api/devices', deviceRouter);
 
