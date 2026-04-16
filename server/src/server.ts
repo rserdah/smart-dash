@@ -1,9 +1,13 @@
+import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
 import cors from 'cors';
 import roomRouter from './routes/rooms/rooms';
 import widgetRouter from './routes/widgets';
 import deviceRouter from './routes/devices/devices';
+import aiRouter from './routes/ai';
 import { DeviceErrorCode, deviceErrorHttpMap } from './services/deviceServices';
+
+dotenv.config();
 
 const app = express();
 const port = 4000;
@@ -37,6 +41,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/rooms', roomRouter);
 app.use('/api/widgets', widgetRouter);
 app.use('/api/devices', deviceRouter);
+app.use('/api/chat', aiRouter);
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);

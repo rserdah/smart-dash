@@ -14,9 +14,11 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@ai-sdk/google": "^3.0.63",
         "@emotion/css": "^11.13.5",
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.1",
+        "ai": "^6.0.159",
         "cors": "^2.8.6",
         "dotenv": "^17.3.1",
         "express": "^5.2.1",
