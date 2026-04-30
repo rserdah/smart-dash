@@ -1,8 +1,9 @@
 /** @jsxImportSource @emotion/react */
 // Modified from ChatGPT
-import { ButtonHTMLAttributes, forwardRef, MouseEventHandler, PropsWithChildren } from 'react';
+import { ButtonHTMLAttributes, forwardRef, MouseEventHandler, PropsWithChildren, useRef } from 'react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import { useOffclick } from '@/hooks/useOffclick';
 
 const ModalOverlay = styled.div`
     position: fixed;
@@ -117,9 +118,16 @@ export function ModalShell({ title, header, children, onClose, custom, simpleOk,
         return null;
     }
 
+    const containerRef = useRef(null);
+
+    useOffclick({
+        ref: containerRef,
+        callback: () => onClose?.(),
+    });
+
     return (
-        <ModalOverlay onClick={onClose}>
-            <ModalContainer onClick={e => e.stopPropagation()}>
+        <ModalOverlay>
+            <ModalContainer ref={containerRef} onClick={e => e.stopPropagation()}>
                 {
                     custom ?
                         <>{children}</>
