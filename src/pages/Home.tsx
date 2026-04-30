@@ -1,6 +1,9 @@
 /** @jsxImportSource @emotion/react */
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
+import { useEffect, useRef, useState } from 'react';
+import { useChat, UseChatHelpers } from '@ai-sdk/react';
+import { DefaultChatTransport, UIDataTypes, UIMessage, UIMessagePart, UITools } from 'ai';
 import Widget from '@/components/Widget';
 import InputKnob from '../components/input/InputKnob';
 import InputText from '../components/input/InputText';
@@ -9,12 +12,14 @@ import InputLinearSlider from '../components/input/InputLinearSlider';
 import InputCheckbox from '../components/input/InputCheckbox';
 import ToggleButton from '../components/input/ToggleButton';
 import { useModal } from '@/modals/ModalContext';
-import { useEffect, useState } from 'react';
+import { ModalHeader, ModalBody, ModalFooter, ModalFooterBtn, ModalShell } from '@/modals/ModalShell';
 import MaterialIcon from '@/components/MaterialIcon';
 import { WeatherWidget } from '@/widgets/weather/WeatherWidget';
 import { DeviceWidget } from '@/widgets/device/DeviceWidget';
 import WidgetController from '@/widgets/WidgetController';
 import ExpandedWidget from '@/widgets/ExpandedWidget';
+import { HideScrollbar } from '@/styles/GlobalStyles';
+import Searchbar from '@/components/Searchbar';
 
 // IMPORTANT! styled.element variables CANNOT be defined inside the functional component or else they will unmount every time the functional component re-renders
 const ImgBackground = styled.img`
@@ -51,26 +56,13 @@ const Box = styled.div`
     padding: 3rem 0px;
 `;
 
-const SearchBox = styled.div`
-    box-sizing: border-box;
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    align-self: start;
+const SearchbarInput = styled.input`
     flex: 1;
-    gap: 10px;
-    padding: 10px;
-    width: 100%;
-    height: 4rem;
-    min-height: 0px;
-    border: 1px solid white;
-    border-radius: 99999px;
-    /* background: var(--container-background-color); */
-    background: #69696910;
+    font-size: 1.6rem;
+    background: transparent;
     color: var(--text-color-inverted);
-    backdrop-filter: blur(10px) saturate(0.9);
-    overflow: hidden;
+    border: none;
+    outline: none;
 `;
 
 const MainContentBox = styled.div`
@@ -173,6 +165,104 @@ const renderRoomDashboard = (room: any) => {
     })
 };
 
+const ChatBox = styled.div`
+    label: ChatBox;
+
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 1rem;
+    overflow: auto;
+
+    ${HideScrollbar}
+`;
+
+const ChatRow = styled.div`
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+`;
+
+const ChatBubble = styled.div`
+    padding: 1rem;
+    max-width: 50%;
+    border-radius: 1rem;
+`;
+
+const AssistantChatBubble = styled(ChatBubble)`
+    margin-right: auto;
+    border-bottom-left-radius: 0.25rem;
+    background: #4D4D4D;
+`;
+
+const SystemChatBubble = styled(ChatBubble)`
+    margin-right: auto;
+    border-bottom-left-radius: 0.25rem;
+    background: #4D4D4D;
+`;
+
+const UserChatBubble = styled(ChatBubble)`
+    margin-left: auto;
+    border-bottom-right-radius: 0.25rem;
+    background: #1687FF;
+`;
+
+interface MessageProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, | ''> {
+    message: UIMessage<unknown, UIDataTypes, UITools>;
+}
+
+const Message = ({ message }: MessageProps) => {
+    switch(message.role) {
+        case 'assistant':
+            return <AssistantMessage message={message} />
+
+        case 'system':
+            return <SystemMessage message={message} />
+
+        case 'user':
+            return <UserMessage message={message} />
+    }
+};
+
+const AssistantMessage = ({ message }: { message: UIMessage<unknown, UIDataTypes, UITools> }) => {
+    let reasoningPart: UIMessagePart<UIDataTypes, UITools> | undefined = undefined, textPart: UIMessagePart<UIDataTypes, UITools> | undefined = undefined;
+
+    // Loop until reasoning AND text parts were found or until reached the end (only display reasoning if text is not found yet or else there will always be both a reasoning chat bubble AND a text response chat bubble)
+    message.parts.some((p: UIMessagePart<UIDataTypes, UITools>) => {
+        if(p.type === 'reasoning') {
+            reasoningPart = p;
+        }
+        else if(p.type === 'text') {
+            textPart = p;
+        }
+
+        return reasoningPart && textPart;
+    });
+
+    if(textPart != undefined) {
+        return <AssistantChatBubble>{textPart.text}</AssistantChatBubble>
+    }
+    else if(reasoningPart != undefined) {
+        return <AssistantChatBubble>Reasoning: {reasoningPart.text}</AssistantChatBubble>
+    }
+};
+
+const SystemMessage = ({ message }: { message: UIMessage<unknown, UIDataTypes, UITools> }) => {
+    return message.parts.map(part => {
+        if(part.type === 'text') {
+            return <SystemChatBubble>{part.text}</SystemChatBubble>
+        }
+    });
+};
+
+const UserMessage = ({ message }: { message: UIMessage<unknown, UIDataTypes, UITools> }) => {
+    return message.parts.map(part => {
+        if(part.type === 'text') {
+            return <UserChatBubble>{part.text}</UserChatBubble>
+        }
+    });
+};
+
 export default function Home() {
     const [roomId, setRoomId] = useState(1 /* 'living_room' */);
     const [widgets, setWidgets] = useState([]);
@@ -193,10 +283,56 @@ export default function Home() {
             .catch(e => console.error(e))
     }, [roomId]);
 
+    const { messages, sendMessage, status } = useChat({
+        transport: new DefaultChatTransport({
+            api: 'http://localhost:4000/api/chat',
+            sendReasoning: true,
+        }),
+    });
+
+    const [modalOpen, setModalOpen] = useState(false);
+    const [searchValue, setSearchValue] = useState('');
+    const lastUserMessageRef = useRef<HTMLElement>(null);
+
+    useEffect(() => {
+        console.log(structuredClone(messages));
+
+        // Was making it scroll to last user view (make sure it goes to the top of the scrollview if possible (might need to add spacing to allow that if the current chatbox isn't currently scrolling))
+        lastUserMessageRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+        });
+    }, [messages]);
+
     // const currentRoom: any = rooms.find((x: any) => x.id == roomId);
 
     return (
         <>
+            {modalOpen && <ModalShell onClose={() => setModalOpen(false)} open>
+                {/* <ModalHeader>Hello</ModalHeader> */}
+
+                <ModalBody css={css`label: ModalBody; display: flex; flex-direction: column; gap: 1rem; flex: 1; min-height: 0px; overflow: unset;`}>
+                    <ChatBox>
+                        {
+                            messages.map((m: UIMessage, i: number) => {
+                                // Assigning the ref multiple times will overwrite it so naturally the last message to satisfy this condition will have the ref attached which is desired
+                                const isLastUserMessage = m.role === 'user' && (messages[i + 1]?.role === 'assistant' || i === messages.length - 1);
+
+                                return <ChatRow>
+                                    <Message key={i} ref={isLastUserMessage ? lastUserMessageRef : null} message={m} />
+                                </ChatRow>
+                            })
+                        }
+                    </ChatBox>
+
+                    <Searchbar onChat={async msg => { setModalOpen(true); await sendMessage({ text: msg }); }} />
+                </ModalBody>
+
+                <ModalFooter>
+                    <ModalFooterBtn onClick={() => setModalOpen(false)}>Close</ModalFooterBtn>
+                </ModalFooter>
+            </ModalShell>}
+
             <div css={css`position: absolute; z-index: -1; min-width: 100vw; max-width: 100vw; min-height: 100vh; max-height: 100vh; background: gray; overflow: hidden;`}>
                 {/* Use key to allow image to have a CSS transition (need to uncomment the @starting-style in this element first) */}
                 <ImgBackground key={`${currentRoom?.roomKey}_${currentRoom?.id}`} src={currentRoom?.img || _roomImgs[currentRoom?.roomKey as keyof typeof _roomImgs] || ''} />
@@ -205,11 +341,7 @@ export default function Home() {
             <Box>
                 {/* <Keyboard /> */}
 
-                <SearchBox>
-                    <MaterialIcon icon='search' />
-
-                    <span>Search</span>
-                </SearchBox>
+                <Searchbar onChat={async msg => { setModalOpen(true); await sendMessage({ text: msg }); }} />
 
                 <MainContentBox>
                     <DashboardGrid>
@@ -417,10 +549,10 @@ export default function Home() {
                 </MainContentBox>
 
                 <RoomSelectorBox>
-                    { rooms.map((x, i) => (
+                    {rooms.map((x, i) => (
                         <RoomSelectorBtn key={`${x.name}_${x.id}_${i}`} onClick={e => setRoomId(r => x.id)} $active={x.id == currentRoom?.id}>{x.name}</RoomSelectorBtn>
-                    )) }
-                    
+                    ))}
+
                     <RoomSelectorBtn className='material-symbols-outlined' css={css`--sidebar-link-size: 32px; display: inline-flex; align-items: center; justify-content: center; padding: 2px; min-width: var(--sidebar-link-size); width: var(--sidebar-link-size); max-width: var(--sidebar-link-size); min-height: var(--sidebar-link-size); height: var(--sidebar-link-size); max-height: var(--sidebar-link-size); font-size: 28px; border-radius: 999px; background: transparent; color: white; &:hover { background: #ffffff2f; }`}>add</RoomSelectorBtn>
                 </RoomSelectorBox>
             </Box>
