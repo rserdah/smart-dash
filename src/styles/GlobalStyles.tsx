@@ -28,6 +28,15 @@ const styles = css`
     }
 `;
 
+export const HideScrollbar = css`
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+`;
+
 export default function GlobalStyles() {
     return (
         <Global styles={styles} />
