@@ -1,12 +1,10 @@
 /** @jsxImportSource @emotion/react */
-import React, { useEffect } from 'react';
-import { useNavigate, useLocation, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { Theme } from '@/theme/types';
-import { baseTheme, themes, ThemeName } from '../theme/index';
-import { useThemeContext } from '../theme/themeContext';
 import MaterialIcon from './MaterialIcon';
+import { useCurrentRoom } from '@/hooks/rooms/useCurrentRoom';
 
 interface SidebarProps {
 }
@@ -49,11 +47,13 @@ const iconStyleGetter = () => css`
 `;
 
 export default function Sidebar(props: SidebarProps) {
+    const { data: roomId } = useCurrentRoom();
+
     return (
         <nav>
             <SidebarBox>
-                <NavLink to='/'><MaterialIcon icon='search' addCssGetter={iconStyleGetter} /></NavLink>
-                <NavLink to='/'><MaterialIcon icon='home' addCssGetter={iconStyleGetter} /></NavLink>
+                <NavLink to={`/dashboard/${roomId}`}><MaterialIcon icon='search' addCssGetter={iconStyleGetter} /></NavLink>
+                <NavLink to={`/dashboard/${roomId}`}><MaterialIcon icon='home' addCssGetter={iconStyleGetter} /></NavLink>
                 <NavLink to='/apps'><MaterialIcon icon='apps' addCssGetter={iconStyleGetter} /></NavLink>
                 <NavLink to='/rooms'><MaterialIcon icon='room_preferences' addCssGetter={iconStyleGetter} /></NavLink>
                 <NavLink to='/devices'><MaterialIcon icon='devices' addCssGetter={iconStyleGetter} /></NavLink>

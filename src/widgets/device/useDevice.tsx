@@ -1,32 +1,57 @@
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useDeviceActions } from './useDeviceActions';
+import { useParams } from 'react-router-dom';
 
 export type DeviceState = {
 } | any;
 
-export function useDevice(device: any) {
-    const [state, setState] = useState<DeviceState>({} as DeviceState);
+export function useDevice(deviceId: number) {
+    const { roomId } = useParams();
 
-    const actions = useDeviceActions(device, setState);
+    const { data: _device, isLoading } = useQuery({
+        queryKey: ['rooms', Number(roomId || 0), 'layout'],
+        queryFn: () => fetch(`http://localhost:4000/api/rooms/${roomId}/layout`).then(res => res.json())/* .then(x => { console.warn(x.dashboard.widgets.find((w: any) => w.widget.deviceId == 1).widget.device.state); return x; }) */,
+        enabled: !!roomId /* && !!deviceId */,
+        select: data => data.dashboard.widgets.find((w: any) => w.widget.deviceId == deviceId).widget.device,
+    });
 
-    const deviceId: number = device.id;
+    const actions = useDeviceActions(_device);
 
-    useEffect(() => {
-        let stateParsed;
-        
+    let stateParsed;
+    if(_device != undefined) {
         try {
-            stateParsed = JSON.parse(device.state);
+            stateParsed = JSON.parse(_device.state);
         }
         catch(e) {
-            console.warn('Device state is not valid JSON');
-            stateParsed = {};
-        }
+            if(e instanceof SyntaxError) {
+                console.warn('Device state is not valid JSON');
+            }
+            else {
+                console.error(e);
+            }
 
-        setState((s: any) => stateParsed);
-    }, [deviceId, setState]);
+            stateParsed = undefined;
+        }
+    }
+    else {
+        stateParsed = undefined;
+    }
+
+    // Conditional return AFTER useDeviceActions or else the number of hooks called can change which will result in a React error
+    if(isLoading || _device == undefined || stateParsed == undefined || actions == undefined) {
+        return {
+            device: null,
+            state: null,
+            actions: null,
+            isLoading: isLoading,
+        };
+    }
 
     return {
-        state,
+        device: _device,
+        state: stateParsed,
         actions,
+        isLoading: isLoading,
     };
 }

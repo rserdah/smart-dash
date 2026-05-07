@@ -1,56 +1,63 @@
 import { useCallback, Dispatch } from 'react';
 import { setDevicePower, setDeviceBrightness, setDeviceColor, setDeviceTemperature } from '@/api/devices';
+import { useQueryClient } from '@tanstack/react-query';
 
-export function useDeviceCallbacks(device: any, setState: Dispatch<any>) {
-    const deviceId: number = device.id;
-
+export function useDeviceCallbacks(device: any) {
+    const deviceId: number = device?.id;
+    const queryClient = useQueryClient();
 
     const setPower = useCallback(async (power: boolean) => {
+        // Can't conditionally call useCallback hook so if device is empty, make the callback itself just return
+        if(!device) { return; }
+
         const result = await setDevicePower(deviceId, power);
 
         // TODO: Parse device state on the backend so it is validated
         result.state = JSON.parse(result.state);
 
         if(result && typeof result.state.power === 'boolean') {
-            setState((s: any) => ({ ...s, power: result.state.power }));
+            queryClient.invalidateQueries({ queryKey: ['rooms'] });
         }
-    }, [deviceId, setState]);
+    }, [device, deviceId]);
 
     const setBrightness = useCallback(async (brightness: number) => {
+        if(!device) { return; }
+
         const result = await setDeviceBrightness(deviceId, brightness);
 
         // TODO: Parse device state on the backend so it is validated
         result.state = JSON.parse(result.state);
 
         if(result && typeof result.state.brightness === 'number') {
-            setState((s: any) => ({ ...s, brightness: result.state.brightness }));
+            queryClient.invalidateQueries({ queryKey: ['rooms'] });
         }
-    }, [deviceId, setState]);
+    }, [device, deviceId]);
 
     const setColor = useCallback(async (color: [number, number, number]) => {
+        if(!device) { return; }
+
         const result = await setDeviceColor(deviceId, color);
 
         // TODO: Parse device state on the backend so it is validated
         result.state = JSON.parse(result.state);
 
         if(result && Array.isArray(result.state.color) && result.state.color.length === 3) {
-            setState((s: any) => ({ ...s, color: result.state.color }));
+            queryClient.invalidateQueries({ queryKey: ['rooms'] });
         }
-    }, [deviceId, setState]);
+    }, [device, deviceId]);
 
     const setTemperature = useCallback(async (value: number) => {
+        if(!device) { return; }
+
         const newValue = Math.max(30, Math.min(90, value));
 
         const result = await setDeviceTemperature(deviceId, newValue);
 
         // TODO: Parse device state on the backend so it is validated
         result.state = JSON.parse(result.state);
-
-        setState((s: any) => ({
-            ...s,
-            targetTemperature: result.state.targetTemperature,
-        }));
-    }, [deviceId, setState]);
+        
+        queryClient.invalidateQueries({ queryKey: ['rooms'] });
+    }, [device, deviceId]);
     
 
     return {

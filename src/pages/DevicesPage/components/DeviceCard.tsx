@@ -43,8 +43,12 @@ const Body = styled.div`
     color: white;
 `;
 
-export default function DeviceCard({ device }: any) {
-    const deviceHook = useDevice(device);
+export default function DeviceCard({ deviceId }: any) {
+    const { device, state, actions, isLoading } = useDevice(deviceId);
+
+    if(isLoading || state == undefined || actions == undefined) {
+        return '';
+    }
 
     return (
         <Card>
@@ -52,7 +56,7 @@ export default function DeviceCard({ device }: any) {
                 <MaterialIcon icon='devices' addCssGetter={() => css`margin-right: 0.5rem;`} />
                 {device.name}
                 <div css={css`margin-left: auto;`}>
-                    <ToggleSwitch checked={deviceHook.state.power} onToggle={deviceHook.actions.setPower} stopPointerDownPropagation />
+                    <ToggleSwitch checked={state.power} onToggle={actions.setPower} stopPointerDownPropagation />
                 </div>
             </Header>
 

@@ -1,8 +1,8 @@
 /** @jsxImportSource @emotion/react */
 import { PropsWithChildren } from 'react';
-import { MemoryRouter, Routes, Route, NavLink } from 'react-router-dom';
+import { MemoryRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import styled from '@emotion/styled';
-import Header from './components/Header';
 import Home from './pages/Home';
 import AppsPage from './pages/AppsPage';
 import Settings from './pages/Settings';
@@ -10,6 +10,7 @@ import Sidebar from './components/Sidebar';
 import DevicesPage from './pages/DevicesPage/DevicesPage';
 import RoomsPage from './pages/Rooms/RoomsPage';
 import RoomPage from './pages/Rooms/RoomPage';
+import { UrlListener } from './components/UrlListener';
 
 interface AppProps extends PropsWithChildren {
 }
@@ -35,27 +36,34 @@ const SidePanelBox = styled.div`
     min-width: 10%;
 `;
 
+const queryClient = new QueryClient();
+
 export default function App(props: AppProps) {
     return (
-        <MemoryRouter>
-            <AppBox>
-                {/* <Header /> */}
+        <QueryClientProvider client={queryClient}>
+            <MemoryRouter initialEntries={['/dashboard/1']}>
+                <AppBox>
+                    <SidePanelBox>
+                        <Sidebar />
+                    </SidePanelBox>
 
-                <SidePanelBox>
-                    <Sidebar />
-                </SidePanelBox>
+                    <Routes>
+                        {/* Dedicated component for listening for changes in URL (must be underneath the Routes component or else useParams in it won't work) */}
+                        {/* Used to sync the roomId from URL with the React Query roomId and possibly other things in the future */}
+                        {/* Outlet renders the currently active child route */}
+                        <Route element={<><UrlListener /><Outlet /></>}>
+                            <Route path='/dashboard/:roomId' element={<Home />} />
+                        </Route>
+                        <Route path='/apps' element={<AppsPage />} />
+                        <Route path='/rooms' element={<RoomsPage />} />
+                        <Route path='/rooms/:id' element={<RoomPage />} />
+                        <Route path='/devices' element={<DevicesPage />} />
+                        <Route path='/settings' element={<Settings />} />
+                    </Routes>
 
-                <Routes>
-                    <Route path='/' element={<Home />} />
-                    <Route path='/apps' element={<AppsPage />} />
-                    <Route path='/rooms' element={<RoomsPage />} />
-                    <Route path='/rooms/:id' element={<RoomPage />} />
-                    <Route path='/devices' element={<DevicesPage />} />
-                    <Route path='/settings' element={<Settings />} />
-                </Routes>
-
-                <SidePanelBox />
-            </AppBox>
-        </MemoryRouter>
+                    <SidePanelBox />
+                </AppBox>
+            </MemoryRouter>
+        </QueryClientProvider>
     )
 }

@@ -2,6 +2,8 @@
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import { useEffect, useRef, useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useChat, UseChatHelpers } from '@ai-sdk/react';
 import { DefaultChatTransport, UIDataTypes, UIMessage, UIMessagePart, UITools } from 'ai';
 import Widget from '@/components/Widget';
@@ -20,6 +22,7 @@ import WidgetController from '@/widgets/WidgetController';
 import ExpandedWidget from '@/widgets/ExpandedWidget';
 import { HideScrollbar } from '@/styles/GlobalStyles';
 import Searchbar from '@/components/Searchbar';
+import { useCurrentRoom } from '@/hooks/rooms/useCurrentRoom';
 
 // IMPORTANT! styled.element variables CANNOT be defined inside the functional component or else they will unmount every time the functional component re-renders
 const ImgBackground = styled.img`
@@ -143,7 +146,11 @@ const renderWidget = (widget: any) => {
             return <WeatherWidget grid={{ col: widget.col, row: widget.row, colSpan: widget.colSpan, rowSpan: widget.rowSpan }} />
 
         case 'device':
-            return <DeviceWidget id={widget.deviceId} device={widget.device} grid={{ col: widget.col, row: widget.row, colSpan: widget.colSpan, rowSpan: widget.rowSpan }} />
+            if(widget.device == undefined) {
+                return null;
+            }
+
+            return <DeviceWidget id={widget.deviceId} deviceId={widget.device?.id} grid={{ col: widget.col, row: widget.row, colSpan: widget.colSpan, rowSpan: widget.rowSpan }} />
 
         default:
             return <WidgetController
@@ -264,30 +271,32 @@ const UserMessage = ({ message }: { message: UIMessage<unknown, UIDataTypes, UIT
 };
 
 export default function Home() {
-    const [roomId, setRoomId] = useState(1 /* 'living_room' */);
-    const [widgets, setWidgets] = useState([]);
-    const [rooms, setRooms] = useState([] as any[]);
-    const [currentRoom, setCurrentRoom] = useState(null as any);
+    const queryClient = useQueryClient();
 
-    useEffect(() => {
-        fetch('http://localhost:4000/api/rooms')
-            .then(res => res.json())
-            .then(json => { setRooms(json); return json; })
-            .catch(e => console.error(e))
-    }, []);
+    const { data: roomId } = useCurrentRoom();
 
-    useEffect(() => {
-        fetch(`http://localhost:4000/api/rooms/${roomId}/layout`)
-            .then(res => res.json())
-            .then(json => { setCurrentRoom(json); return json; })
-            .catch(e => console.error(e))
-    }, [roomId]);
+    const { data: rooms = [] } = useQuery({
+        queryKey: ['rooms'],
+        queryFn: () => fetch('http://localhost:4000/api/rooms').then(res => res.json())/* .then(x => { console.log(x); return x; }) */
+    });
+
+    const { data: currentRoom, isLoading: isLayoutLoading } = useQuery({
+        queryKey: ['rooms', roomId, 'layout'],
+        queryFn: () => fetch(`http://localhost:4000/api/rooms/${roomId}/layout`).then(res => res.json())/* .then(x => { console.warn(x.dashboard.widgets.find((w: any) => w.widget.deviceId == 1).widget.device.state); return x; }) */
+    });
 
     const { messages, sendMessage, status } = useChat({
         transport: new DefaultChatTransport({
             api: 'http://localhost:4000/api/chat',
             sendReasoning: true,
         }),
+        onToolCall: ({ toolCall }) => {
+            console.log('toolCall', toolCall);
+
+            if(toolCall.toolName === 'controlDevice') {
+                queryClient.invalidateQueries({ queryKey: ['rooms'] });
+            }
+        },
     });
 
     const [modalOpen, setModalOpen] = useState(false);
@@ -295,7 +304,7 @@ export default function Home() {
     const lastUserMessageRef = useRef<HTMLElement>(null);
 
     useEffect(() => {
-        console.log(structuredClone(messages));
+        // console.log(structuredClone(messages));
 
         // Was making it scroll to last user view (make sure it goes to the top of the scrollview if possible (might need to add spacing to allow that if the current chatbox isn't currently scrolling))
         lastUserMessageRef.current?.scrollIntoView({
@@ -303,8 +312,6 @@ export default function Home() {
             block: 'start',
         });
     }, [messages]);
-
-    // const currentRoom: any = rooms.find((x: any) => x.id == roomId);
 
     return (
         <>
@@ -346,105 +353,8 @@ export default function Home() {
                 <MainContentBox>
                     <DashboardGrid>
                         {renderRoomDashboard(currentRoom)}
-                    </DashboardGrid>
 
-                    {/* <DashboardGrid>
-                        <WidgetSlot $col={1} $row={1} $colSpan={8} $rowSpan={2}>
-                            <LightWidget grid={{col: 1, row: 1, colSpan: 1, rowSpan: 1}} />
-                        </WidgetSlot>
-
-                        <WidgetSlot $col={9} $row={1} $colSpan={2} $rowSpan={2}>
-                            <WidgetController
-                                compactRender={props => <Widget addCssGetter={() => css`height: 100%;`} title='test7' onLongPress={() => props.setExpanded(true)} />}
-                                expandedRender={props => <ExpandedWidget title='test7' state={{}} actions={{}} />}
-                            />
-                        </WidgetSlot>
-
-                        <WidgetSlot $col={11} $row={1} $colSpan={2} $rowSpan={2}>
-                            <WidgetController
-                                compactRender={props => <Widget addCssGetter={() => css`height: 100%;`} title='test8' onLongPress={() => props.setExpanded(true)} />}
-                                expandedRender={props => <ExpandedWidget title='test8' state={{}} actions={{}} />}
-                            />
-                        </WidgetSlot>
-
-                        <WidgetSlot $col={1} $row={3} $colSpan={2} $rowSpan={2}>
-                            <WidgetController
-                                compactRender={props => (
-                                    <Widget
-                                        addCssGetter={() => css`height: 100%;`}
-                                        header={<div css={css`display: flex; flex-direction: row; gap: 10px;`}><InputCheckbox name='testCheckbox' stopPointerDownPropagation /><span css={css`color: white;`}>Lighting</span></div>}
-                                        onLongPress={() => props.setExpanded(true)}
-                                    >
-                                    </Widget>
-                                )}
-                                expandedRender={props => (
-                                    <ExpandedWidget title='test8' header={<div css={css`display: flex; flex-direction: row; gap: 10px;`}><InputCheckbox name='testCheckbox' stopPointerDownPropagation /><span css={css`color: white;`}>Lighting</span></div>} state={{}} actions={{}} >
-                                    </ExpandedWidget>
-                                )}
-                            />
-                        </WidgetSlot>
-
-                        <WidgetSlot $col={3} $row={3} $colSpan={2} $rowSpan={2}>
-                            <WidgetController
-                                compactRender={props => (
-                                    <Widget title='Light' addCssGetter={() => css`height: 100%;`} onLongPress={() => props.setExpanded(true)} >
-                                        <div css={css`display: flex; align-items: center; justify-content: center; height: 100%;`}>
-                                            <ToggleButton name='testToggleButton' />
-                                        </div>
-                                    </Widget>
-                                )}
-                                expandedRender={props => (
-                                    <ExpandedWidget title='Light' state={{}} actions={{}} >
-                                        <div css={css`display: flex; align-items: center; justify-content: center; height: 100%;`}>
-                                            <ToggleButton name='testToggleButton' />
-                                        </div>
-                                    </ExpandedWidget>
-                                )}
-                            />
-                        </WidgetSlot>
-
-                        <WidgetSlot $col={5} $row={3} $colSpan={2} $rowSpan={2}>
-                            <WidgetController
-                                compactRender={props => (
-                                    <Widget title='test3' addCssGetter={() => css`height: 100%;`} onLongPress={() => props.setExpanded(true)} >
-                                        <div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}>
-                                            <InputKnob name='' stopPointerDownPropagation />
-                                        </div>
-                                    </Widget>
-                                )}
-                                expandedRender={props => (
-                                    <ExpandedWidget title='test3' state={{}} actions={{}} >
-                                        <div css={css`display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;`}>
-                                            <InputKnob name='' stopPointerDownPropagation />
-                                        </div>
-                                    </ExpandedWidget>
-                                )}
-                            />
-                        </WidgetSlot>
-
-                        <WidgetSlot $col={7} $row={3} $colSpan={2} $rowSpan={2}>
-                            <WidgetController
-                                compactRender={props => <Widget title='test4' addCssGetter={() => css`height: 100%;`} onLongPress={() => props.setExpanded(true)} />}
-                                expandedRender={props => <ExpandedWidget title='test4' state={{}} actions={{}} />}
-                            />
-                        </WidgetSlot>
-
-                        <WidgetSlot $col={9} $row={3} $colSpan={4} $rowSpan={1}>
-                            <WidgetController
-                                compactRender={props => (
-                                    <Widget title='new test' addCssGetter={() => css`height: 100%;`} onLongPress={() => props.setExpanded(true)} >
-                                        <InputText stopPointerDownPropagation />
-                                    </Widget>
-                                )}
-                                expandedRender={props => (
-                                    <ExpandedWidget title='new test' state={{}} actions={{}} >
-                                        <InputText stopPointerDownPropagation />
-                                    </ExpandedWidget>
-                                )}
-                            />
-                        </WidgetSlot>
-
-                        <WidgetSlot $col={1} $row={5} $colSpan={4} $rowSpan={2}>
+                        {/* <WidgetSlot $col={1} $row={5} $colSpan={4} $rowSpan={2}>
                             <WidgetController
                                 compactRender={props => (
                                     <Widget onLongPress={() => props.setExpanded(true)} custom>
@@ -481,10 +391,6 @@ export default function Home() {
                                     </ExpandedWidget>
                                 )}
                             />
-                        </WidgetSlot>
-
-                        <WidgetSlot $col={5} $row={5} $colSpan={4} $rowSpan={2}>
-                            <WeatherWidget grid={{col: 1, row: 1, colSpan: 1, rowSpan: 1}} />
                         </WidgetSlot>
 
                         <WidgetSlot $col={9} $row={4} $colSpan={4} $rowSpan={3}>
@@ -544,13 +450,15 @@ export default function Home() {
                                     </ExpandedWidget>
                                 )}
                             />
-                        </WidgetSlot>
-                    </DashboardGrid> */}
+                        </WidgetSlot> */}
+                    </DashboardGrid>
                 </MainContentBox>
 
                 <RoomSelectorBox>
                     {rooms.map((x, i) => (
-                        <RoomSelectorBtn key={`${x.name}_${x.id}_${i}`} onClick={e => setRoomId(r => x.id)} $active={x.id == currentRoom?.id}>{x.name}</RoomSelectorBtn>
+                        <NavLink to={`/dashboard/${x.id}`}>
+                            <RoomSelectorBtn key={`${x.name}_${x.id}_${i}`} $active={x.id == currentRoom?.id}>{x.name}</RoomSelectorBtn>
+                        </NavLink>
                     ))}
 
                     <RoomSelectorBtn className='material-symbols-outlined' css={css`--sidebar-link-size: 32px; display: inline-flex; align-items: center; justify-content: center; padding: 2px; min-width: var(--sidebar-link-size); width: var(--sidebar-link-size); max-width: var(--sidebar-link-size); min-height: var(--sidebar-link-size); height: var(--sidebar-link-size); max-height: var(--sidebar-link-size); font-size: 28px; border-radius: 999px; background: transparent; color: white; &:hover { background: #ffffff2f; }`}>add</RoomSelectorBtn>

@@ -62,7 +62,7 @@ export default function DevicesPage() {
 
                     <Thing1>
                         { devices.map((device: any, i: number) => (
-                            <DeviceCard key={`${device.name}_${device.id}_${i}`} device={device} />
+                            <DeviceCard key={`${device.name}_${device.id}_${i}`} deviceId={device.id} />
                         )) }
                     </Thing1>
                 </div>
