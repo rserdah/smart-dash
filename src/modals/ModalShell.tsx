@@ -22,11 +22,13 @@ const ModalOverlay = styled.div`
 `;
 
 const ModalContainer = styled.div`
+    label: ModalContainer;
     display: flex;
     flex-direction: column;
     gap: 16px;
     padding: 20px;
-    width: min(90vw, 480px);
+    min-width: min(90vw, 480px);
+    max-width: 90vw;
     max-height: 90vh;
     border: 1px solid var(--input-border-color);
     border-radius: 20px;

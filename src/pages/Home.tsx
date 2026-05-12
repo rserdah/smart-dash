@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useChat, UseChatHelpers } from '@ai-sdk/react';
@@ -23,6 +23,7 @@ import ExpandedWidget from '@/widgets/ExpandedWidget';
 import { HideScrollbar } from '@/styles/GlobalStyles';
 import Searchbar from '@/components/Searchbar';
 import { useCurrentRoom } from '@/hooks/rooms/useCurrentRoom';
+import { fetchDevices } from '@/api/devices';
 
 // IMPORTANT! styled.element variables CANNOT be defined inside the functional component or else they will unmount every time the functional component re-renders
 const ImgBackground = styled.img`
@@ -57,6 +58,24 @@ const Box = styled.div`
     grid-template-rows: auto 48rem auto;
     gap: 10px;
     padding: 3rem 0px;
+`;
+
+const TempButton = styled.button`
+    --button-size: 2.8rem;
+    appearance: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    min-width: var(--button-size);
+    width: var(--button-size);
+    max-width: var(--button-size);
+    min-height: var(--button-size);
+    height: var(--button-size);
+    max-height: var(--button-size);
+    border: none;
+    border-radius: 999rem;
+    background: #116EFF;
 `;
 
 const SearchbarInput = styled.input`
@@ -273,6 +292,11 @@ const UserMessage = ({ message }: { message: UIMessage<unknown, UIDataTypes, UIT
 export default function Home() {
     const queryClient = useQueryClient();
 
+    const { data: allDevices = [] } = useQuery({
+        queryKey: ['devices'],
+        queryFn: fetchDevices,
+    });
+
     const { data: roomId } = useCurrentRoom();
 
     const { data: rooms = [] } = useQuery({
@@ -280,15 +304,24 @@ export default function Home() {
         queryFn: () => fetch('http://localhost:4000/api/rooms').then(res => res.json())/* .then(x => { console.log(x); return x; }) */
     });
 
-    const { data: currentRoom, isLoading: isLayoutLoading } = useQuery({
+    const { data: roomLayout, isLoading: isLayoutLoading } = useQuery({
         queryKey: ['rooms', roomId, 'layout'],
         queryFn: () => fetch(`http://localhost:4000/api/rooms/${roomId}/layout`).then(res => res.json())/* .then(x => { console.warn(x.dashboard.widgets.find((w: any) => w.widget.deviceId == 1).widget.device.state); return x; }) */
     });
+
+    const { data: roomDevices = [] } = useQuery({
+        queryKey: ['rooms', roomId, 'devices'],
+        queryFn: () => fetch(`http://localhost:4000/api/rooms/${roomId}/devices`).then(res => res.json())/* .then(x => { console.log(x); return x; }) */
+    });
+
+    console.log('roomDevices', roomDevices);
+    console.log('allDevices', allDevices);
 
     const { messages, sendMessage, status } = useChat({
         transport: new DefaultChatTransport({
             api: 'http://localhost:4000/api/chat',
             sendReasoning: true,
+            /* The body option here does not work because it doesn't seem to get the most updated values from useQuery so body is passed in sendMessage */
         }),
         onToolCall: ({ toolCall }) => {
             console.log('toolCall', toolCall);
@@ -298,6 +331,18 @@ export default function Home() {
             }
         },
     });
+
+    const onChat = useCallback(async (msg: string) => {
+        setModalOpen(true);
+
+        await sendMessage({ text: msg }, {
+            body: {
+                room: { roomId: roomId, roomKey: roomDevices.roomKey, roomName: roomDevices.name },
+                roomDevices: roomDevices?.devices?.map?.(x => ({ deviceId: x.id, roomId: x.roomId, deviceName: x.name, deviceType: x.type, capabilities: x.capabilities, currentState: JSON.parse(x.state) })),
+                allDevices: allDevices?.map?.(x => ({ deviceId: x.id, roomId: x.roomId, deviceName: x.name, deviceType: x.type, capabilities: x.capabilities, currentState: JSON.parse(x.state) })),
+            }
+        });
+    }, [roomId, allDevices, roomDevices]);
 
     const [modalOpen, setModalOpen] = useState(false);
     const [searchValue, setSearchValue] = useState('');
@@ -315,24 +360,28 @@ export default function Home() {
 
     return (
         <>
-            {modalOpen && <ModalShell onClose={() => setModalOpen(false)} open>
-                {/* <ModalHeader>Hello</ModalHeader> */}
+            {modalOpen && <ModalShell onClose={() => setModalOpen(false)} css={css`display: none; width: unset; max-width: 90vw;`} open>
+                <ModalBody css={css`label: ModalBody; display: flex; flex-direction: row; gap: 1rem; flex: 1; min-height: 0px; overflow: unset;`}>
+                    <div css={css`flex: 1; width: max-content; min-width: 20rem; background: red;`}>
+                        <div css={css`width: 50rem; max-width: 100%; height: 10rem; background: blue;`}></div>
+                    </div>
 
-                <ModalBody css={css`label: ModalBody; display: flex; flex-direction: column; gap: 1rem; flex: 1; min-height: 0px; overflow: unset;`}>
-                    <ChatBox>
-                        {
-                            messages.map((m: UIMessage, i: number) => {
-                                // Assigning the ref multiple times will overwrite it so naturally the last message to satisfy this condition will have the ref attached which is desired
-                                const isLastUserMessage = m.role === 'user' && (messages[i + 1]?.role === 'assistant' || i === messages.length - 1);
+                    <div css={css`display: flex; flex-direction: column; gap: 1rem; width: 20rem; min-height: 0px; overflow: unset;`}>
+                        <ChatBox>
+                            {
+                                messages.map((m: UIMessage, i: number) => {
+                                    // Assigning the ref multiple times will overwrite it so naturally the last message to satisfy this condition will have the ref attached which is desired
+                                    const isLastUserMessage = m.role === 'user' && (messages[i + 1]?.role === 'assistant' || i === messages.length - 1);
 
-                                return <ChatRow>
-                                    <Message key={i} ref={isLastUserMessage ? lastUserMessageRef : null} message={m} />
-                                </ChatRow>
-                            })
-                        }
-                    </ChatBox>
+                                    return <ChatRow>
+                                        <Message key={i} ref={isLastUserMessage ? lastUserMessageRef : null} message={m} />
+                                    </ChatRow>
+                                })
+                            }
+                        </ChatBox>
 
-                    <Searchbar onChat={async msg => { setModalOpen(true); await sendMessage({ text: msg }); }} />
+                        <Searchbar onChat={onChat} />
+                    </div>
                 </ModalBody>
 
                 <ModalFooter>
@@ -342,17 +391,23 @@ export default function Home() {
 
             <div css={css`position: absolute; z-index: -1; min-width: 100vw; max-width: 100vw; min-height: 100vh; max-height: 100vh; background: gray; overflow: hidden;`}>
                 {/* Use key to allow image to have a CSS transition (need to uncomment the @starting-style in this element first) */}
-                <ImgBackground key={`${currentRoom?.roomKey}_${currentRoom?.id}`} src={currentRoom?.img || _roomImgs[currentRoom?.roomKey as keyof typeof _roomImgs] || ''} />
+                <ImgBackground key={`${roomLayout?.roomKey}_${roomLayout?.id}`} src={roomLayout?.img || _roomImgs[roomLayout?.roomKey as keyof typeof _roomImgs] || ''} />
             </div>
 
             <Box>
                 {/* <Keyboard /> */}
 
-                <Searchbar onChat={async msg => { setModalOpen(true); await sendMessage({ text: msg }); }} />
+                <div css={css`display: flex; align-items: center; gap: 1rem; width: 100%`}>
+                    <Searchbar onChat={onChat} />
+
+                    <TempButton onClick={() => setModalOpen(true)} type='button'>
+                        <MaterialIcon icon='visibility' wght={300} addCssGetter={() => css`font-size: 2rem; margin-left: 0.25rem; color: white;`} />
+                    </TempButton>
+                </div>
 
                 <MainContentBox>
                     <DashboardGrid>
-                        {renderRoomDashboard(currentRoom)}
+                        {renderRoomDashboard(roomLayout)}
 
                         {/* <WidgetSlot $col={1} $row={5} $colSpan={4} $rowSpan={2}>
                             <WidgetController
@@ -457,7 +512,7 @@ export default function Home() {
                 <RoomSelectorBox>
                     {rooms.map((x, i) => (
                         <NavLink to={`/dashboard/${x.id}`}>
-                            <RoomSelectorBtn key={`${x.name}_${x.id}_${i}`} $active={x.id == currentRoom?.id}>{x.name}</RoomSelectorBtn>
+                            <RoomSelectorBtn key={`${x.name}_${x.id}_${i}`} $active={x.id == roomLayout?.id}>{x.name}</RoomSelectorBtn>
                         </NavLink>
                     ))}
 

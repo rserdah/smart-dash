@@ -17,6 +17,7 @@ interface SearchbarProps {
 const SearchbarRelativeBox = styled.div`
     label: SearchbarRelativeBox;
     --searchbar-box-closed-height: 4rem;
+    flex: 1;
     min-height: var(--searchbar-box-closed-height);
     height: var(--searchbar-box-closed-height);
     max-height: var(--searchbar-box-closed-height);
