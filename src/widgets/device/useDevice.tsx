@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useDeviceActions } from './useDeviceActions';
 import { useParams } from 'react-router-dom';
@@ -18,10 +18,13 @@ export function useDevice(deviceId: number) {
 
     const actions = useDeviceActions(_device);
 
-    let stateParsed;
-    if(_device != undefined) {
+    let stateParsed = useMemo(() => {
+        if(_device == undefined) {
+            return undefined;
+        }
+
         try {
-            stateParsed = JSON.parse(_device.state);
+            return JSON.parse(_device.state);
         }
         catch(e) {
             if(e instanceof SyntaxError) {
@@ -31,22 +34,19 @@ export function useDevice(deviceId: number) {
                 console.error(e);
             }
 
-            stateParsed = undefined;
+            return undefined;
         }
-    }
-    else {
-        stateParsed = undefined;
-    }
+    }, [_device]);
 
     // Conditional return AFTER useDeviceActions or else the number of hooks called can change which will result in a React error
-    if(isLoading || _device == undefined || stateParsed == undefined || actions == undefined) {
+    /* if(isLoading || _device == undefined || stateParsed == undefined || actions == undefined) {
         return {
             device: null,
             state: null,
             actions: null,
             isLoading: isLoading,
         };
-    }
+    } */
 
     return {
         device: _device,

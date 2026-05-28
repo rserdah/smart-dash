@@ -10,8 +10,8 @@ type Props = {
         row: number;
         rowSpan: number;
     };
+
     deviceId: number;
-    device: any;
 };
 
 const TypeRegistry = {
@@ -24,8 +24,8 @@ const TypeRegistry = {
 export function DeviceWidget({ grid, deviceId }: Props) {
     const { device, state, actions, isLoading } = useDevice(deviceId);
 
-    if(isLoading || state == undefined || actions == undefined) {
-        return 'aaaaa';
+    if(isLoading || device == undefined || state == undefined || actions == undefined) {
+        return 'Loading...';
     }
 
     const Component = TypeRegistry[(device.type as keyof typeof TypeRegistry)];

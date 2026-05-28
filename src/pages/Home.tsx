@@ -169,7 +169,7 @@ const renderWidget = (widget: any) => {
                 return null;
             }
 
-            return <DeviceWidget id={widget.deviceId} deviceId={widget.device?.id} grid={{ col: widget.col, row: widget.row, colSpan: widget.colSpan, rowSpan: widget.rowSpan }} />
+            return <DeviceWidget deviceId={widget.device?.id} grid={{ col: widget.col, row: widget.row, colSpan: widget.colSpan, rowSpan: widget.rowSpan }} />
 
         default:
             return <WidgetController
@@ -251,32 +251,74 @@ const Message = ({ message }: MessageProps) => {
 };
 
 const AssistantMessage = ({ message }: { message: UIMessage<unknown, UIDataTypes, UITools> }) => {
-    let reasoningPart: UIMessagePart<UIDataTypes, UITools> | undefined = undefined, textPart: UIMessagePart<UIDataTypes, UITools> | undefined = undefined;
+    let textPart: UIMessagePart<UIDataTypes, UITools> | undefined = undefined;
 
-    // Loop until reasoning AND text parts were found or until reached the end (only display reasoning if text is not found yet or else there will always be both a reasoning chat bubble AND a text response chat bubble)
+    const SuggestedComponent = <SuggestedUiMessage message={message} />
+
+    // Loop until text part was found or until reached the end
     message.parts.some((p: UIMessagePart<UIDataTypes, UITools>) => {
-        if(p.type === 'reasoning') {
-            reasoningPart = p;
-        }
-        else if(p.type === 'text') {
+        if(p.type === 'text') {
             textPart = p;
         }
 
-        return reasoningPart && textPart;
+        return !!textPart;
     });
 
     if(textPart != undefined) {
-        return <AssistantChatBubble>{textPart.text}</AssistantChatBubble>
+        return <>
+            {SuggestedComponent}
+            <AssistantChatBubble>{textPart.text}</AssistantChatBubble>
+        </>
     }
-    else if(reasoningPart != undefined) {
-        return <AssistantChatBubble>Reasoning: {reasoningPart.text}</AssistantChatBubble>
+    else {
+        return <AssistantChatBubble>Thinking...</AssistantChatBubble>
     }
+};
+
+const SuggestedUiMessage = ({ message }: { message: UIMessage<unknown, UIDataTypes, UITools> }) => {
+    let targetPart;
+
+    const hasUiContent = message.role === 'assistant' && message.parts.some((part: any) => {
+        const isTool = part.type === 'tool-display_content' && part.state === 'output-available';
+
+        if(isTool) {
+            targetPart = part;
+        }
+
+        return isTool;
+    });
+
+    const suggestedUi = targetPart?.output.suggestedUi;
+
+    if(!hasUiContent || !Array.isArray(suggestedUi?.components) || suggestedUi.components.length === 0) {
+        return null;
+    }
+
+    return !(Array.isArray(suggestedUi?.components) && suggestedUi.components.length > 0) ? null : suggestedUi.components.map((x: any) => {
+        const suggestedUiProps = x.props;
+
+        switch(x.type) {
+            case 'TEXT':
+                return <></>
+                return <ChatRow><div>{suggestedUiProps?.text}</div></ChatRow>
+
+            case 'DEVICE_CONTROL':
+                return <AssistantChatBubble><ChatRow><DeviceWidget {...(suggestedUiProps || {})} grid={{ col: 1, row: 1, colSpan: 1, rowSpan: 4 }} /></ChatRow></AssistantChatBubble>
+
+            case 'WEATHER':
+                console.warn('suggestedUiProps', suggestedUiProps);
+                return <AssistantChatBubble><ChatRow><WeatherWidget {...(suggestedUiProps || {})} grid={{ col: 1, row: 1, colSpan: 1, rowSpan: 4 }} /></ChatRow></AssistantChatBubble>
+
+            default:
+                return <AssistantChatBubble><ChatRow><span>Invalid suggestedUi</span></ChatRow></AssistantChatBubble>
+        }
+    });
 };
 
 const SystemMessage = ({ message }: { message: UIMessage<unknown, UIDataTypes, UITools> }) => {
     return message.parts.map(part => {
         if(part.type === 'text') {
-            return <SystemChatBubble>{part.text}</SystemChatBubble>
+            return <ChatRow><SystemChatBubble>{part.text}</SystemChatBubble></ChatRow>
         }
     });
 };
@@ -284,7 +326,7 @@ const SystemMessage = ({ message }: { message: UIMessage<unknown, UIDataTypes, U
 const UserMessage = ({ message }: { message: UIMessage<unknown, UIDataTypes, UITools> }) => {
     return message.parts.map(part => {
         if(part.type === 'text') {
-            return <UserChatBubble>{part.text}</UserChatBubble>
+            return <ChatRow><UserChatBubble>{part.text}</UserChatBubble></ChatRow>
         }
     });
 };
@@ -314,19 +356,14 @@ export default function Home() {
         queryFn: () => fetch(`http://localhost:4000/api/rooms/${roomId}/devices`).then(res => res.json())/* .then(x => { console.log(x); return x; }) */
     });
 
-    console.log('roomDevices', roomDevices);
-    console.log('allDevices', allDevices);
-
-    const { messages, sendMessage, status } = useChat({
+    let { messages, sendMessage, status } = useChat({
         transport: new DefaultChatTransport({
             api: 'http://localhost:4000/api/chat',
             sendReasoning: true,
             /* The body option here does not work because it doesn't seem to get the most updated values from useQuery so body is passed in sendMessage */
         }),
         onToolCall: ({ toolCall }) => {
-            console.log('toolCall', toolCall);
-
-            if(toolCall.toolName === 'controlDevice') {
+            if(toolCall.toolName === 'execute_control_device') {
                 queryClient.invalidateQueries({ queryKey: ['rooms'] });
             }
         },
@@ -344,7 +381,7 @@ export default function Home() {
         });
     }, [roomId, allDevices, roomDevices]);
 
-    const [modalOpen, setModalOpen] = useState(false);
+    const [modalOpen, setModalOpen] = useState(true);
     const [searchValue, setSearchValue] = useState('');
     const lastUserMessageRef = useRef<HTMLElement>(null);
 
@@ -362,20 +399,14 @@ export default function Home() {
         <>
             {modalOpen && <ModalShell onClose={() => setModalOpen(false)} css={css`display: none; width: unset; max-width: 90vw;`} open>
                 <ModalBody css={css`label: ModalBody; display: flex; flex-direction: row; gap: 1rem; flex: 1; min-height: 0px; overflow: unset;`}>
-                    <div css={css`flex: 1; width: max-content; min-width: 20rem; background: red;`}>
-                        <div css={css`width: 50rem; max-width: 100%; height: 10rem; background: blue;`}></div>
-                    </div>
-
-                    <div css={css`display: flex; flex-direction: column; gap: 1rem; width: 20rem; min-height: 0px; overflow: unset;`}>
+                    <div css={css`display: flex; flex-direction: column; gap: 1rem; width: 100%; min-height: 0px; overflow: unset;`}>
                         <ChatBox>
                             {
                                 messages.map((m: UIMessage, i: number) => {
                                     // Assigning the ref multiple times will overwrite it so naturally the last message to satisfy this condition will have the ref attached which is desired
                                     const isLastUserMessage = m.role === 'user' && (messages[i + 1]?.role === 'assistant' || i === messages.length - 1);
 
-                                    return <ChatRow>
-                                        <Message key={i} ref={isLastUserMessage ? lastUserMessageRef : null} message={m} />
-                                    </ChatRow>
+                                    return <Message key={i} ref={isLastUserMessage ? lastUserMessageRef : null} message={m} />
                                 })
                             }
                         </ChatBox>

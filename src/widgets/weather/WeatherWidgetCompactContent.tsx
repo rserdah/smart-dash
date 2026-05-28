@@ -1,12 +1,10 @@
 /** @jsxImportSource @emotion/react */
-import { use, useEffect, useState } from 'react';
+import { use, useState } from 'react';
 import { css } from '@emotion/react';
 import styled from "@emotion/styled";
-import ToggleButton from "@/components/input/ToggleButton";
 import { WeatherState, WeatherActions } from "./useWeatherWidget";
 import Widget from '@/components/Widget';
 import { ModalProps, ModalBody, ModalFooter, ModalFooterBtn } from '@/modals/ModalShell';
-import ToggleSwitch from "@/components/input/ToggleSwitch";
 import { useModal } from '@/modals/ModalContext';
 import MaterialIcon from '@/components/MaterialIcon';
 import ExpandedWidget from '../ExpandedWidget';
@@ -17,7 +15,57 @@ type Props = {
     actions: WeatherActions;
     setExpanded: (expanded: boolean) => void;
     expanded: boolean;
+    locationCity: string;
+    locationState: string;
+    locationCountry: string;
+    locationString?: string;
 };
+
+const Div1 = styled.div`
+    display: flex;
+    flex-direction: column;
+    color: white;
+`;
+
+const Div2 = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+`;
+
+const IconLocationBox = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+`;
+
+const LocationBox = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
+
+const Div3 = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    width: 100%;
+    font-weight: 200;
+`;
+
+const Div4 = styled.div<{ $currentDay: boolean }>`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    width: 3.2rem;
+    border-radius: 5px;
+    background: ${p => p.$currentDay ? '#ffffff48' : 'transparent'};
+`;
 
 function ConfirmModal({ message, onConfirm, onClose }: ModalProps) {
     return (
@@ -44,7 +92,7 @@ const weekdayIndices = {
     'Saturday': 6,
 };
 
-export default function WeatherWidgetCompact({ state, actions, setExpanded, expanded }: Props) {
+export default function WeatherWidgetCompact({ state, actions, setExpanded, expanded, locationCity, locationState, locationCountry, locationString }: Props) {
     const [checked, setChecked] = useState(false);
     const modal = useModal();
 
@@ -341,31 +389,38 @@ export default function WeatherWidgetCompact({ state, actions, setExpanded, expa
     return (
         <Container
             header={<>
-                <div css={css`display: flex; flex-direction: column; color: white;`}>
-                    <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
-                        <MaterialIcon icon='partly_cloudy_day' wght={300} addCssGetter={() => css`font-size: 4rem; color: yellow;`} />
-                        <span css={css`font-size: 2.4rem;`}>{`${temperature}°${temperatureUnit}`}</span>
-                    </div>
+                <Div1>
+                    <Div2>
+                        <IconLocationBox>
+                            <MaterialIcon icon='partly_cloudy_day' wght={300} addCssGetter={() => css`font-size: 4rem; color: yellow;`} />
 
-                    <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between;`}>
+                            { (locationString || (locationCity && locationState)) && <LocationBox>
+                                <span>{locationString ? locationString : `${locationCity}, ${locationState}`}</span>
+                            </LocationBox> }
+                        </IconLocationBox>
+
+                        <span css={css`font-size: 2.4rem;`}>{`${temperature}°${temperatureUnit}`}</span>
+                    </Div2>
+
+                    <Div2>
                         <span css={css``}>{shortForecast}</span>
                         <span css={css``}>{`${windSpeed} wind`}</span>
-                    </div>
-                </div>
+                    </Div2>
+                </Div1>
             </>}
             addCssGetter={() => css`${ !expanded ? css`height: 100%;` : css``} background: #00aeff91; border-color: #70d2ffff; background: radial-gradient(#96bcde 60%, #5a96c6); background-size: 1000px 1000px; background-repeat: no-repeat;`}
             onLongPress={() => setExpanded(true)}
         >
-            <div css={css`display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-top: auto; width: 100%; font-weight: 200;`}>
+            <Div3>
                 {
                     weatherData?.forecastPeriods && weekForecast.map((x: any, i) => (
-                        <div css={css`display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; width: 3.2rem; border-radius: 5px; background: ${new Date().getDay() == i ? '#ffffff48' : 'transparent'};`}>
+                        <Div4 $currentDay={new Date().getDay() == i}>
                             <span css={css`color: #ffffff8e;`}>{x ? (x.name+'').charAt(0) : '--'}</span>
                             <span>{x ? `${x.temperature}°` : 'ERR'}</span>
-                        </div>
+                        </Div4>
                     ))
                 }
-            </div>
+            </Div3>
         </Container>
     )
 }
