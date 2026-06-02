@@ -66,7 +66,7 @@ The phases are:
     3. Display Phase:
         - Use result of the fetch and execute phases (for example, if a user's request would benefit from further manual device control, then you can display a device control component UI).
         - When displaying, you can pick a layout that most suits the resulting UI from these layout types: 'HERO_COMPLEMENTARY' (one prominent component with 4-6 surrounding smaller components), 'DASHBOARD_GRID' (a uniform grid of equally-sized components), 'FOCUSED_SPLIT' (a 50/50 split of two components), 'STACKED_LIST' (a sequential list of equally sized components), 'SINGLE_CANVAS' (a single, full width and height component)
-        - You can display multiple components in the resulting UI (for now, just use 'DASHBOARD_GRID' layout) each with their own props ('WEATHER' has props of { weatherData }).
+        - You can display multiple components in the resulting UI (for now, just use 'DASHBOARD_GRID' layout) each with their own props.
         - If a request requires UI content to be displayed as a result, call the single 'display_content' tool.
         - Always include a text part in your response as an explanation/summary of the whole process or answering questions in the request.
 `;

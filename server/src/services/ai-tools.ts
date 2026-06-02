@@ -151,8 +151,9 @@ export const homeTools = {
                     }
                 - 'WEATHER'
                     - props: {
-                        weatherData: Weather data from the fetch phase,
-                        locationString: 'City, State' string deduced from the user request
+                        locationString: 'City, State' string deduced from the user request,
+                        longitude,
+                        latitude,
                     }
         `,
         inputSchema: z.object({
@@ -170,7 +171,6 @@ export const homeTools = {
                         type: z.literal('WEATHER'),
                         /* Use looseObject or else if even one property doesn't match, the whole object will be empty object */
                         props: z.looseObject({
-                            weatherData: z.object().describe(`The 'weatherData' from the 'fetch_weather' call`),
                             locationString: z.string().describe(`The 'City, State' deduced from the user request`),
                             longitude: z.number().describe(``),
                             latitude: z.number().describe(``),
