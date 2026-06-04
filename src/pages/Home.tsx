@@ -472,12 +472,6 @@ export default function Home() {
         });
     }, [messages]);
 
-    console.log(structuredClone(messages));
-
-    const groupedMessages = messages.reduce((res, m) => {
-
-    }, []);
-
     return (
         <>
             {modalOpen && <ModalShell onClose={() => setModalOpen(false)} css={css`display: none; width: unset; max-width: 90vw;`} open>
