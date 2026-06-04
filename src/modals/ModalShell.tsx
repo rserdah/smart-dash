@@ -4,6 +4,7 @@ import { ButtonHTMLAttributes, forwardRef, MouseEventHandler, PropsWithChildren,
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useOffclick } from '@/hooks/useOffclick';
+import { useKeyDown } from '@/hooks/useKeyDown';
 
 const ModalOverlay = styled.div`
     position: fixed;
@@ -125,6 +126,12 @@ export function ModalShell({ title, header, children, onClose, custom, simpleOk,
     useOffclick({
         ref: containerRef,
         callback: () => onClose?.(),
+    });
+
+    useKeyDown({
+        key: 'Escape',
+        callback: () => onClose?.(),
+        enabled: true,
     });
 
     return (
