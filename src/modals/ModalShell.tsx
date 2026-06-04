@@ -28,7 +28,8 @@ const ModalContainer = styled.div`
     flex-direction: column;
     gap: 16px;
     padding: 20px;
-    min-width: min(90vw, 480px);
+    /* min-width: min(90vw, 480px); */
+    min-width: 90vw;
     max-width: 90vw;
     max-height: 90vh;
     border: 1px solid var(--input-border-color);

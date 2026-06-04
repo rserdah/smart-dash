@@ -203,7 +203,34 @@ const ChatBox = styled.div`
     ${HideScrollbar}
 `;
 
+const ChatBubbleGroup = styled.div`
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 1px;
+
+    /* First Bubble */
+    & > *:first-child:not(:last-child) {
+        --top-radius: 1rem;
+        --bottom-radius: 0rem;
+    }
+
+    /* Middle Bubble(s) */
+    & > *:not(:last-child):not(:first-child) {
+        --top-radius: 0rem;
+        --bottom-radius: 0rem;
+    }
+
+    /* Last Bubble */
+    & > *:last-child:not(:first-child) {
+        --top-radius: 0rem;
+        --bottom-radius: 1rem;
+    }
+`;
+
 const ChatRow = styled.div`
+    label: ChatRow;
+
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -217,20 +244,70 @@ const ChatBubble = styled.div`
 
 const AssistantChatBubble = styled(ChatBubble)`
     margin-right: auto;
-    border-bottom-left-radius: 0.25rem;
+    border-top-left-radius: var(--top-radius, 1rem);
+    border-bottom-left-radius: var(--bottom-radius, 0.25rem);
+    background: #4D4D4D;
+`;
+
+const AiSuggestedUiChatBubble = styled(ChatBubble)`
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    min-width: 100%;
+    max-width: unset;
+    margin-right: auto;
+    border-top-left-radius: var(--top-radius, 1rem);
+    border-bottom-left-radius: var(--bottom-radius, 0.25rem);
     background: #4D4D4D;
 `;
 
 const SystemChatBubble = styled(ChatBubble)`
     margin-right: auto;
-    border-bottom-left-radius: 0.25rem;
+    border-top-left-radius: var(--top-radius, 1rem);
+    border-bottom-left-radius: var(--bottom-radius, 0.25rem);
     background: #4D4D4D;
 `;
 
 const UserChatBubble = styled(ChatBubble)`
     margin-left: auto;
-    border-bottom-right-radius: 0.25rem;
+    border-top-right-radius: var(--top-radius, 1rem);
+    border-bottom-right-radius: var(--bottom-radius, 0.25rem);
     background: #1687FF;
+`;
+
+const AiSuggestedLayout = styled.div<{ $layout: string, $count: number }>`
+    --ui-grid-gap: 1rem;
+    display: grid;
+    gap: var(--ui-grid-gap);
+    flex: 1;
+    min-width: 0px;
+
+    ${p => {
+        console.log('p.$layout', p.$layout);
+        switch(p.$layout) {
+            case 'DASHBOARD_GRID':
+                return `
+                    /* grid-template-columns: repeat(${p.$count ?? 2}, 1fr); */
+                    grid-template-columns: repeat(auto-fill, minmax(clamp(calc(25rem - var(--ui-grid-gap, 0px)), calc(25% - var(--ui-grid-gap, 0px)), calc(100% - var(--ui-grid-gap, 0px))), 1fr));
+                `;
+
+            case 'HERO':
+                return `
+                    grid-template-columns: repeat(4, 1fr);
+                    grid-template-rows: repeat(3, minmax(100px, auto));
+
+                    & > *:nth-child(1) {
+                        grid-column: span 4;
+                        grid-row: span 2;
+                    }
+
+                    & > *:not(:nth-child(1)) {
+                        grid-column: span 1;
+                        grid-row: span 1;
+                    }
+                `;
+        }
+    }}
 `;
 
 interface MessageProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, | ''> {
@@ -294,7 +371,7 @@ const SuggestedUiMessage = ({ message }: { message: UIMessage<unknown, UIDataTyp
         return null;
     }
 
-    return !(Array.isArray(suggestedUi?.components) && suggestedUi.components.length > 0) ? null : suggestedUi.components.map((x: any) => {
+    return !(Array.isArray(suggestedUi?.components) && suggestedUi.components.length > 0) ? null : <ChatRow><AiSuggestedUiChatBubble><AiSuggestedLayout $layout={suggestedUi.layout} $count={suggestedUi.components.length}>{suggestedUi.components.map((x: any) => {
         const suggestedUiProps = x.props;
 
         switch(x.type) {
@@ -303,16 +380,16 @@ const SuggestedUiMessage = ({ message }: { message: UIMessage<unknown, UIDataTyp
                 return <ChatRow><div>{suggestedUiProps?.text}</div></ChatRow>
 
             case 'DEVICE_CONTROL':
-                return <AssistantChatBubble><ChatRow><DeviceWidget {...(suggestedUiProps || {})} grid={{ col: 1, row: 1, colSpan: 1, rowSpan: 4 }} /></ChatRow></AssistantChatBubble>
+                return <DeviceWidget {...(suggestedUiProps || {})} grid={{ col: 1, row: 1, colSpan: 1, rowSpan: 4 }} />
 
             case 'WEATHER':
                 console.warn('suggestedUiProps', suggestedUiProps);
-                return <AssistantChatBubble><ChatRow><WeatherWidget {...(suggestedUiProps || {})} grid={{ col: 1, row: 1, colSpan: 1, rowSpan: 4 }} /></ChatRow></AssistantChatBubble>
+                return <WeatherWidget {...(suggestedUiProps || {})} grid={{ col: 1, row: 1, colSpan: 1, rowSpan: 4 }} />
 
             default:
-                return <AssistantChatBubble><ChatRow><span>Invalid suggestedUi</span></ChatRow></AssistantChatBubble>
+                return <span>Invalid suggestedUi</span>
         }
-    });
+    })}</AiSuggestedLayout></AiSuggestedUiChatBubble></ChatRow>
 };
 
 const SystemMessage = ({ message }: { message: UIMessage<unknown, UIDataTypes, UITools> }) => {
@@ -395,6 +472,12 @@ export default function Home() {
         });
     }, [messages]);
 
+    console.log(structuredClone(messages));
+
+    const groupedMessages = messages.reduce((res, m) => {
+
+    }, []);
+
     return (
         <>
             {modalOpen && <ModalShell onClose={() => setModalOpen(false)} css={css`display: none; width: unset; max-width: 90vw;`} open>
@@ -406,7 +489,7 @@ export default function Home() {
                                     // Assigning the ref multiple times will overwrite it so naturally the last message to satisfy this condition will have the ref attached which is desired
                                     const isLastUserMessage = m.role === 'user' && (messages[i + 1]?.role === 'assistant' || i === messages.length - 1);
 
-                                    return <Message key={i} ref={isLastUserMessage ? lastUserMessageRef : null} message={m} />
+                                    return <ChatBubbleGroup><Message key={i} ref={isLastUserMessage ? lastUserMessageRef : null} message={m} /></ChatBubbleGroup>
                                 })
                             }
                         </ChatBox>
